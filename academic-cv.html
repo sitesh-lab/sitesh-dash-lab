@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sitesh Kumar Dash — Academic CV</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ── TOKENS ── */
+    :root {
+      --navy:  #1C3557;
+      --ink:   #111827;
+      --muted: #4B5563;
+      --light: #6B7280;
+      --rule:  #D1D9E0;
+      --bg:    #FFFFFF;
+      --tint:  #F4F7FA;
+      --jrf:   #0B5394;
+      --note:  #FFF8ED;
+      --note-b:#D97706;
+    }
+
+    /* ── RESET ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    /* ── BODY — full screen, scales with viewport ── */
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      font-size: 14px;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+      width: 100%;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 52px clamp(28px, 6%, 100px);
+    }
+    a { color: var(--navy); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ── HEADER ── */
+    .cv-header {
+      text-align: center;
+      padding-bottom: 24px;
+      border-bottom: 2.5px solid var(--navy);
+      margin-bottom: 28px;
+    }
+    .cv-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 38px; font-weight: 700;
+      letter-spacing: -1px; color: var(--navy);
+      margin-bottom: 8px;
+    }
+    .jrf-row {
+      display: flex; justify-content: center;
+      align-items: center; flex-wrap: wrap;
+      gap: 10px; margin-bottom: 8px;
+    }
+    .jrf-badge {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13.5px; font-weight: 700;
+      color: #fff; background: var(--jrf);
+      border-radius: 5px; padding: 4px 14px;
+    }
+    .jrf-rank { font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; font-weight: 600; color: var(--jrf); }
+    .jrf-sep  { color: var(--rule); font-size: 18px; }
+    .cv-discipline { font-size: 13.5px; color: var(--muted); margin-bottom: 10px; font-style: italic; }
+    .cv-contact {
+      font-size: 12.5px; color: var(--light);
+      display: flex; justify-content: center;
+      flex-wrap: wrap; gap: 18px; row-gap: 5px;
+    }
+    .cv-contact a { color: var(--navy); }
+
+    /* ── SECTION ── */
+    .section { margin-bottom: 26px; }
+    .sec-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--navy);
+      border-bottom: 1.5px solid var(--navy);
+      padding-bottom: 6px; margin-bottom: 16px;
+    }
+
+    /* ── STATEMENT ── */
+    .statement {
+      background: var(--tint);
+      border-left: 3px solid var(--navy);
+      padding: 16px 20px;
+      border-radius: 0 5px 5px 0;
+      font-size: 14px; line-height: 1.78; color: var(--ink);
+    }
+    .statement strong { color: var(--navy); }
+
+    /* ── ENTRIES ── */
+    .entry { margin-bottom: 18px; }
+    .entry:last-child { margin-bottom: 0; }
+    .entry-hd {
+      display: flex; justify-content: space-between;
+      align-items: flex-start; gap: 16px; margin-bottom: 5px;
+    }
+    .entry-left    { flex: 1; min-width: 0; }
+    .entry-title   { font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 600; color: var(--ink); }
+    .entry-org     { font-size: 13.5px; font-weight: 500; color: var(--navy); margin-top: 2px; }
+    .entry-sub     { font-size: 12.5px; color: var(--muted); font-style: italic; margin-top: 2px; }
+    .entry-right   { display: flex; flex-direction: column; align-items: flex-end; flex-shrink: 0; gap: 4px; }
+    .entry-date    { font-size: 12.5px; color: var(--muted); white-space: nowrap; font-weight: 500; }
+    .entry-grade   { font-size: 12px; font-weight: 700; color: var(--navy); white-space: nowrap; }
+
+    .bullets { list-style: none; margin-top: 8px; }
+    .bullets li {
+      font-size: 13.5px; color: var(--ink);
+      padding: 3px 0 3px 18px;
+      position: relative; line-height: 1.68;
+    }
+    .bullets li::before {
+      content: '—'; position: absolute; left: 0;
+      color: var(--navy); font-size: 11px; top: 4px;
+    }
+
+    /* ── NOTE ── */
+    .note {
+      background: var(--note);
+      border-left: 3px solid var(--note-b);
+      padding: 12px 16px; border-radius: 0 5px 5px 0;
+      font-size: 13px; color: #78350F; line-height: 1.68;
+      margin-top: 10px;
+    }
+    .note strong { color: #92400E; }
+
+    /* ── AWARD ── */
+    .award-entry {
+      display: flex; justify-content: space-between;
+      align-items: flex-start; gap: 16px;
+      padding: 16px 20px;
+      background: var(--tint);
+      border-left: 4px solid var(--jrf);
+      border-radius: 0 5px 5px 0;
+    }
+    .award-title { font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 700; color: var(--jrf); margin-bottom: 5px; }
+    .award-body  { font-size: 13px; color: var(--ink); line-height: 1.65; }
+    .award-rank  {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 52px; font-weight: 700;
+      color: var(--jrf); letter-spacing: -2px;
+      flex-shrink: 0; line-height: 1;
+    }
+
+    /* ── RESEARCH BOX ── */
+    .research-box {
+      border: 1.5px solid var(--navy);
+      border-radius: 6px; padding: 20px 24px;
+      margin-bottom: 14px;
+    }
+    .rb-title { font-family: 'Space Grotesk', sans-serif; font-size: 14.5px; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
+    .rb-sub   { font-size: 12.5px; color: var(--muted); margin-bottom: 12px; font-style: italic; }
+    .research-box .bullets li { font-size: 13px; }
+
+    .aims-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px; margin-top: 14px;
+    }
+    .aim-card  { background: var(--tint); border: 1px solid var(--rule); border-radius: 5px; padding: 12px 14px; }
+    .aim-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--navy); margin-bottom: 5px; }
+    .aim-text  { font-size: 12px; color: var(--ink); line-height: 1.55; }
+
+    .inst-row  { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; align-items: center; }
+    .inst-lbl  { font-size: 12px; color: var(--muted); }
+    .inst-chip { font-size: 12px; font-weight: 500; border: 1px solid var(--navy); color: var(--navy); padding: 3px 11px; border-radius: 4px; }
+
+    /* ── MANUSCRIPTS ── */
+    .manuscript {
+      border: 1px solid var(--rule);
+      border-radius: 5px; padding: 14px 18px;
+      margin-bottom: 12px;
+    }
+    .ms-status { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: #B45309; margin-bottom: 5px; }
+    .ms-cite   { font-size: 13px; color: var(--ink); line-height: 1.72; }
+    .ms-note   { font-size: 12px; color: var(--muted); margin-top: 6px; font-style: italic; line-height: 1.6; }
+
+    /* ── SKILLS ── */
+    .skills-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 32px; }
+    .skill-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--navy); margin-bottom: 5px; }
+    .skill-list  { font-size: 13px; color: var(--ink); line-height: 1.7; }
+
+    /* ── INLINE ── */
+    .inline-list { font-size: 13.5px; color: var(--ink); line-height: 1.8; }
+    .divider     { height: 1px; background: var(--rule); margin: 20px 0; }
+
+
+    /* ══════════════════════════════════════════
+       MOBILE  ≤ 700px
+    ══════════════════════════════════════════ */
+    @media (max-width: 700px) {
+      body { padding: 28px 5%; font-size: 13px; }
+
+      .cv-name       { font-size: 28px; letter-spacing: -0.5px; }
+      .jrf-badge     { font-size: 12px; padding: 3px 10px; }
+      .jrf-rank      { font-size: 12px; }
+      .jrf-sep       { display: none; }
+      .jrf-row       { gap: 6px; }
+      .cv-discipline { font-size: 12px; }
+      .cv-contact    { font-size: 11.5px; gap: 12px; row-gap: 6px; }
+
+      .section       { margin-bottom: 20px; }
+      .statement     { font-size: 13px; padding: 13px 15px; }
+
+      .entry-hd      { flex-direction: column; gap: 4px; }
+      .entry-right   { flex-direction: row; align-items: center; gap: 10px; align-self: flex-start; }
+      .entry-date    { white-space: normal; }
+      .entry-title   { font-size: 14px; }
+
+      .award-entry   { flex-direction: column-reverse; gap: 10px; padding: 14px 16px; }
+      .award-rank    { font-size: 36px; }
+      .award-title   { font-size: 14px; }
+
+      .aims-grid     { grid-template-columns: 1fr; gap: 8px; }
+      .skills-grid   { grid-template-columns: 1fr; gap: 14px; }
+
+      .inst-row      { gap: 6px; }
+      .inst-chip     { font-size: 11px; padding: 2px 8px; }
+
+      .research-box  { padding: 14px 15px; }
+      .rb-title      { font-size: 13.5px; }
+      .research-box .bullets li { font-size: 12.5px; }
+
+      .manuscript    { padding: 12px 14px; }
+      .ms-cite       { font-size: 12px; }
+      .ms-note       { font-size: 11.5px; }
+      .bullets li    { font-size: 13px; padding-left: 16px; }
+      .note          { font-size: 12px; }
+    }
+
+    @media (max-width: 420px) {
+      body           { padding: 20px 4%; font-size: 12.5px; }
+      .cv-name       { font-size: 24px; }
+      .cv-contact    { flex-direction: column; align-items: center; gap: 5px; }
+    }
+
+    /* Large desktop — even bigger */
+    @media (min-width: 1200px) {
+      body           { font-size: 14.5px; }
+      .cv-name       { font-size: 42px; }
+      .award-rank    { font-size: 60px; }
+    }
+
+
+    /* ══════════════════════════════════════════
+       PRINT — A4, works from mobile & desktop
+    ══════════════════════════════════════════ */
+    @media print {
+
+      @page {
+        size: A4 portrait;
+        margin: 12mm 14mm;
+      }
+
+      html {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+      }
+
+      *, *::before, *::after {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+      }
+
+      body {
+        padding: 0 !important;
+        font-size: 10.5px !important;
+        line-height: 1.48 !important;
+        max-width: none !important;
+        width: 100% !important;
+        margin: 0 !important;
+        background: white !important;
+        color: #111827 !important;
+      }
+
+      a { color: #1C3557 !important; }
+
+      /* header */
+      .cv-header    { padding-bottom: 14px !important; margin-bottom: 16px !important; border-bottom-width: 2px !important; }
+      .cv-name      { font-size: 26px !important; letter-spacing: -0.5px !important; }
+      .jrf-badge    { font-size: 11.5px !important; padding: 2px 10px !important; }
+      .jrf-rank     { font-size: 11.5px !important; }
+      .cv-discipline { font-size: 11.5px !important; margin-bottom: 6px !important; }
+      .cv-contact   { font-size: 10.5px !important; gap: 12px !important; }
+
+      /* sections */
+      .section      { margin-bottom: 14px !important; }
+      .sec-title    { font-size: 9px !important; padding-bottom: 4px !important; margin-bottom: 10px !important; }
+      .statement    { font-size: 10.5px !important; padding: 10px 14px !important; }
+
+      /* entries */
+      .entry        { margin-bottom: 10px !important; page-break-inside: avoid !important; }
+      .entry-hd     { flex-direction: row !important; margin-bottom: 3px !important; gap: 10px !important; }
+      .entry-right  { flex-direction: column !important; align-items: flex-end !important; }
+      .entry-title  { font-size: 11.5px !important; }
+      .entry-org    { font-size: 11px !important; margin-top: 1px !important; }
+      .entry-sub    { font-size: 10.5px !important; }
+      .entry-date   { font-size: 10px !important; white-space: nowrap !important; }
+      .entry-grade  { font-size: 10px !important; }
+      .bullets      { margin-top: 5px !important; }
+      .bullets li   { font-size: 10.5px !important; padding: 1.5px 0 1.5px 14px !important; line-height: 1.46 !important; }
+      .note         { font-size: 10px !important; padding: 8px 12px !important; margin-top: 6px !important; }
+
+      /* award */
+      .award-entry  { padding: 10px 14px !important; flex-direction: row !important; }
+      .award-title  { font-size: 12px !important; margin-bottom: 3px !important; }
+      .award-body   { font-size: 10.5px !important; }
+      .award-rank   { font-size: 32px !important; }
+
+      /* research box */
+      .research-box { padding: 12px 16px !important; margin-bottom: 10px !important; page-break-inside: avoid !important; }
+      .rb-title     { font-size: 11.5px !important; margin-bottom: 3px !important; }
+      .rb-sub       { font-size: 10.5px !important; margin-bottom: 8px !important; }
+      .research-box .bullets li { font-size: 10.5px !important; }
+      .aims-grid    { grid-template-columns: repeat(3,1fr) !important; gap: 7px !important; margin-top: 8px !important; }
+      .aim-card     { padding: 8px 10px !important; }
+      .aim-label    { font-size: 8px !important; }
+      .aim-text     { font-size: 10px !important; }
+      .inst-row     { margin-top: 8px !important; gap: 5px !important; }
+      .inst-chip    { font-size: 10px !important; padding: 1px 7px !important; }
+      .inst-lbl     { font-size: 10px !important; }
+
+      /* manuscripts */
+      .manuscript   { padding: 9px 12px !important; margin-bottom: 8px !important; page-break-inside: avoid !important; }
+      .ms-status    { font-size: 9px !important; margin-bottom: 3px !important; }
+      .ms-cite      { font-size: 10.5px !important; }
+      .ms-note      { font-size: 10px !important; margin-top: 4px !important; }
+
+      /* skills */
+      .skills-grid  { grid-template-columns: 1fr 1fr !important; gap: 10px 20px !important; }
+      .skill-label  { font-size: 9px !important; margin-bottom: 3px !important; }
+      .skill-list   { font-size: 10.5px !important; }
+
+      .inline-list  { font-size: 11px !important; }
+      .divider      { margin: 12px 0 !important; }
+
+      .section      { page-break-inside: avoid !important; }
+      .sec-title    { page-break-after: avoid !important; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══ -->
+<header class="cv-header">
+  <div class="cv-name">Sitesh Kumar Dash</div>
+  <div class="jrf-row">
+    <span class="jrf-badge">CSIR-UGC NET JRF</span>
+    <span class="jrf-rank">All India Rank 153</span>
+    <span class="jrf-sep">·</span>
+    <span class="jrf-rank">Life Sciences · June 2025</span>
+  </div>
+  <div class="cv-discipline">PhD Aspirant in Synthetic Biology / Biomedical Sciences / Neurotoxicology &nbsp;·&nbsp; M.Sc. Biochemistry &amp; Molecular Biology, Pondicherry University</div>
+  <div class="cv-contact">
+    <span><a href="mailto:dsitesh2003@gmail.com">dsitesh2003@gmail.com</a></span>
+    <span><a href="mailto:sitesh@paraminnovation.org">sitesh@paraminnovation.org</a> (work)</span>
+    <span>+91 9566513307</span>
+    <span><a href="https://linkedin.com/in/d-sitesh">linkedin.com/in/d-sitesh</a></span>
+    <span><a href="https://siteshkumardash.vercel.app">siteshkumardash.vercel.app</a></span>
+    <span>Bengaluru, KA · Base: Cuttack, OD</span>
+  </div>
+</header>
+
+<!-- ═══ RESEARCH STATEMENT ═══ -->
+<div class="section">
+  <div class="sec-title">Research Statement</div>
+  <div class="statement">
+    My research sits at the intersection of <strong>synthetic biology, macrophage immunoengineering, and environmental neurotoxicology</strong>. I am developing the <strong>Remac-PET System</strong> — engineering human macrophages (THP-1 derived) to express a lysosome-targeted FAST-PETase fusion protein, enabling intracellular biodegradation of phagocytosed PET micro- and nanoplastics. The system simultaneously addresses direct nanoplastic neurotoxicity via ROS-driven mitochondrial dysfunction, microplastic-induced frustrated phagocytosis in brain microglia, and the transgenerational epigenetic consequence — hypermethylation of the BDNF promoter. A parallel research line examines human cognition in informal science settings: schema activation, visual focal point dependency, and age-stratified pattern recognition in naturalistic human-robot interaction (Curves of Thought, N ≈ 1,568). I seek a PhD environment where these lines can be developed, funded, and published.
+  </div>
+</div>
+
+<!-- ═══ AWARDS ═══ -->
+<div class="section">
+  <div class="sec-title">Awards &amp; Fellowships</div>
+  <div class="award-entry">
+    <div>
+      <div class="award-title">CSIR Junior Research Fellowship (JRF) — Joint CSIR-UGC NET</div>
+      <div class="award-body">
+        Qualified for both Junior Research Fellowship and Eligibility for Assistant Professorship / Lectureship in Life Sciences. Enables fully-funded PhD research at any CSIR institute or central university in India. Examined across biochemistry, molecular biology, cell biology, genetics, and allied life sciences at the national level.<br>
+        <strong>Exam:</strong> June 2025 &nbsp;·&nbsp; <strong>Category:</strong> Life Sciences
+      </div>
+    </div>
+    <div class="award-rank">153</div>
+  </div>
+</div>
+
+<!-- ═══ EDUCATION ═══ -->
+<div class="section">
+  <div class="sec-title">Education</div>
+
+  <div class="entry">
+    <div class="entry-hd">
+      <div class="entry-left">
+        <div class="entry-title">M.Sc. — Biochemistry &amp; Molecular Biology</div>
+        <div class="entry-org">Pondicherry University (A Central University), Puducherry</div>
+        <div class="entry-sub">Register No. 23368060 &nbsp;·&nbsp; Total Credits Earned: 75</div>
+      </div>
+      <div class="entry-right">
+        <div class="entry-date">2023 — 2025</div>
+        <div class="entry-grade">CGPA 6.07 / 10 · First Class</div>
+      </div>
+    </div>
+    <ul class="bullets">
+      <li>Completed modules: Analytical Biochemistry &amp; Biophysics, Biomolecules &amp; Bioenergetics, Cell Biology, Enzymology, Molecular Biology, Molecular Genetics, Molecular Endocrinology, Human Physiology, Immunology, Genetic Engineering, Proteomics, Plant Biochemistry &amp; Biotechnology, Genomics, General Microbiology, Introduction to Bioinformatics, Bioinformatics Databases &amp; Tools, Biostatistics &amp; Scientific Writing, Spectroscopy in Biology.</li>
+      <li>Strong practical and applied scores: Biomolecules Lab (83/100, A+), Biophysical Techniques (75/100, A+), Molecular Biology Lab (78/100, A), Metabolism &amp; Regulation Lab (75/100, A), Bioinformatics Databases &amp; Tools (68/100, B+), Spectroscopy in Biology (66/100, B+).</li>
+    </ul>
+    <div class="note">
+      <strong>Note on dissertation:</strong> No formal dissertation was completed. The absence reflects institutional infrastructure constraints — a meaningful experimental timeline was not viable when reagent procurement averaged 7–8 working days per order (versus 1–2 days in a well-resourced lab), making a standard benchwork protocol impossible to execute. In lieu of thesis research, completed advanced elective modules including Biophysical Techniques (75/A+), Spectroscopy in Biology, Bioinformatics Databases &amp; Tools, and Biostatistics &amp; Scientific Writing. The Remac-PET System, conceptualised and developed entirely independently outside the formal curriculum, represents the research output that a properly resourced dissertation would have produced.
+    </div>
+  </div>
+
+  <div class="entry">
+    <div class="entry-hd">
+      <div class="entry-left">
+        <div class="entry-title">B.Sc. — Zoology (Hons.), Chemistry &amp; Botany</div>
+        <div class="entry-org">S.V.M. College (Autonomous), Jagatsinghpur, Odisha &nbsp;·&nbsp; Affiliated to Utkal University</div>
+        <div class="entry-sub">Roll No. SVM/ZOOL20039 &nbsp;·&nbsp; Session 2020–2023, CBCS</div>
+      </div>
+      <div class="entry-right">
+        <div class="entry-date">2020 — 2023</div>
+        <div class="entry-grade">CGPA 8.82 / 10 · A+ · First Class Distinction</div>
+      </div>
+    </div>
+    <ul class="bullets">
+      <li>Equivalent percentage: 83.20%. Consistent high performance across all six semesters (SGPAs: 9.00, 9.55, 8.14, 8.93, 9.00, 8.50). Core discipline: Zoology (Honours). Generic electives: Chemistry, Botany.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ═══ PROPOSED PHD ═══ -->
+<div class="section">
+  <div class="sec-title">Proposed PhD Research</div>
+  <div class="research-box">
+    <div class="rb-title">The Remac-PET System: Engineering Macrophages for Multi-Scale Bioremediation of Micro- and Nanoplastics (MNPs)</div>
+    <div class="rb-sub">Synthetic Biology / Biomedical Sciences / Neurotoxicology &nbsp;·&nbsp; Stage: Independently developed proposal seeking PhD placement</div>
+    <ul class="bullets">
+      <li><strong>Problem:</strong> MNPs are detectable in every major human organ. The human prefrontal cortex reached a median concentration of 4,917 μg/g in 2024 — a 47% increase from 2016 (Nihart &amp; Campen et al., Nature Medicine, 2025). No therapeutic strategy exists to reverse this bioaccumulation.</li>
+      <li><strong>Engineering approach:</strong> Lentiviral transduction (Vpx-packaged, overcoming SAMHD1 restriction in myeloid cells) of THP-1 monocytes with [Igκ-Leader]–[FAST-PETase N233K/R224Q/S121E/D186H/R280A]–[LAMP1 cytoplasmic tail] fusion protein under EF1α promoter. The LAMP1 GYEQF tyrosine-based sorting signal directs enzymatic activity precisely to the lysosome — where phagocytosed MNPs reside.</li>
+      <li><strong>Epigenetic readout:</strong> MNP-driven neuroinflammation causes BDNF promoter IV hypermethylation. Bisulfite sequencing (nt −250 to +50, 12 CpG sites) across a Transwell co-culture (Remac-PET macrophages / SH-SY5Y neurons) tests whether MNP clearance rescues epigenetic damage — a novel testable mechanistic claim with no published precedent.</li>
+      <li><strong>Evolutionary grounding:</strong> FAST-PETase (Lu et al., Nature 2022), Ideonella sakaiensis (Yoshida et al., Science 2016), and fungal PET degraders across Aspergillus, Ganoderma, and Penicillium establish enzymatic PET hydrolysis as biologically feasible across kingdoms of life. Remac-PET imports this catalytic capacity into the human immune cell.</li>
+    </ul>
+    <div class="aims-grid">
+      <div class="aim-card">
+        <div class="aim-label">Aim 1</div>
+        <div class="aim-text">Molecular engineering and acid-tolerance validation of the Lyso-PETase fusion construct at lysosomal pH 4.5; yeast surface display directed evolution library screening (∼10⁵ variants).</div>
+      </div>
+      <div class="aim-card">
+        <div class="aim-label">Aim 2</div>
+        <div class="aim-text">Generation and characterisation of the Remac-PET cell line; lysosomal co-localisation (target PCC &gt; 0.75); HPLC-MS quantification of EG and TPA degradation products at 24 and 72 h.</div>
+      </div>
+      <div class="aim-card">
+        <div class="aim-label">Aim 3</div>
+        <div class="aim-text">Transwell neuroprotection assay; BDNF promoter bisulfite sequencing and ChIP-qPCR for H3K27me3 across four experimental groups; LDH, JC-1, CellROX, and Caspase-Glo readouts.</div>
+      </div>
+    </div>
+    <div class="inst-row">
+      <span class="inst-lbl">Target institutions:</span>
+      <span class="inst-chip">AIIMS New Delhi</span>
+      <span class="inst-chip">IISc Bangalore</span>
+      <span class="inst-chip">BITS Pilani</span>
+      <span class="inst-chip">MIT</span>
+      <span class="inst-chip">Harvard Medical School</span>
+      <span class="inst-chip">UCL</span>
+      <span class="inst-chip">TU Delft</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MANUSCRIPTS ═══ -->
+<div class="section">
+  <div class="sec-title">Manuscripts &amp; Research Output</div>
+
+  <div class="manuscript">
+    <div class="ms-status">Manuscript in Preparation — 1 &nbsp;·&nbsp; Synthetic Biology / Biomedical Sciences</div>
+    <div class="ms-cite"><strong>Dash, S.K.</strong> (2026). The Remac-PET System: Engineering Macrophages for Multi-Scale Bioremediation of Micro- and Nanoplastics to Halt Neurotoxicity and Prevent Transgenerational Epigenetic Inheritance. <em>PhD Research Proposal / Manuscript in preparation.</em></div>
+    <div class="ms-note">Independently developed. Grounded in 24 peer-reviewed citations from Nature, Nature Medicine, Science, NEJM, Cell Metabolism, Science Advances, Gene Therapy, Frontiers in Microbiology, and OECD Reports. Target journals upon experimental completion: <em>Nature Biomedical Engineering · Cell Chemical Biology · ACS Synthetic Biology.</em></div>
+  </div>
+
+  <div class="manuscript">
+    <div class="ms-status">Manuscript in Preparation — 2 &nbsp;·&nbsp; Cognitive Science / Science Education / HRI</div>
+    <div class="ms-cite"><strong>Dash, S.K.</strong> (2026). Curves of Thought: Schema Activation, Age-Dependent Pattern Recognition, and Visual Focal Point Dependency in a Naturalistic Human-Robot Interaction Study. <em>Manuscript in preparation.</em> ParSEC Whitefield, PARAM Foundation, Bengaluru.</div>
+    <div class="ms-note">Naturalistic observational study at the 'Math in Motion' cobot exhibit. Study period: 15 April – 11 June 2026. N ≈ 1,568 visitors (children &lt;15: n ≈ 400; adults 15–50: n ≈ 900; older adults 50+: n ≈ 268). Three formal RQs: visual focal point dependency on spatial tracking; schema-driven age-stratified pattern recognition; facilitation effects on recognition outcomes. Key novel contribution: <em>schema version specificity</em> — categorical familiarity is insufficient for recognition when the stored prototype version does not match the geometric form presented (Batman Curve age-by-exposure natural experiment; 0 adults correct, all 15 correct identifications were children with current visual exposure). Facilitation bias sub-study: 4 secondary SC observers (n ≈ 70–80). Grounded in Johansson (1973), Bartlett (1932), Rosch (1978), Rayner (1998), Sweller (1988), Vygotsky (1978), Falk &amp; Dierking (2000).<br>Target journals: <em>Journal of Science Education and Technology · Frontiers in Psychology · Public Understanding of Science · International Journal of Human-Computer Studies.</em></div>
+  </div>
+
+  <div class="manuscript">
+    <div class="ms-status">Exhibit Design Proposal &nbsp;·&nbsp; Ideation / Pre-approval Stage</div>
+    <div class="ms-cite"><strong>Dash, S.K.</strong> (2026). ParSEC Biotech Story Arc: A Five-Zone Interactive Biology Gallery. <em>Exhibit Design Ideation Proposal, Draft v1.0.</em> PARAM Foundation, Bengaluru.</div>
+    <div class="ms-note">Five-zone interactive biology gallery concept: cell biology (Build Your Own Cell — 3-metre inflatable cell, pogo-pin conductive organelle system, ESP32 + Raspberry Pi 4), central dogma, bioenergetics, antimicrobial resistance, and genetic engineering. Includes detailed hardware specifications, visitor flow design, multilingual accessibility (Hindi, Kannada, Tamil, English), and narrative arc. Proposal stage — not yet approved for construction.</div>
+  </div>
+</div>
+
+<!-- ═══ RESEARCH EXPERIENCE ═══ -->
+<div class="section">
+  <div class="sec-title">Research Experience</div>
+
+  <div class="entry">
+    <div class="entry-hd">
+      <div class="entry-left">
+        <div class="entry-title">M.Sc. Graduate Researcher</div>
+        <div class="entry-org">Pondicherry University — Life Sciences Department</div>
+      </div>
+      <div class="entry-right"><div class="entry-date">Oct 2023 — May 2025</div></div>
+    </div>
+    <ul class="bullets">
+      <li>Conceptualised the Remac-PET System from first principles; designed a complete in silico computational pipeline for enzymatic degradation of PET microplastics targeting the lysosomal compartment of engineered macrophages.</li>
+      <li>Independently managed wet-lab workflows: expression vector engineering, ELISA characterisation with high inter-assay reproducibility, Western Blotting with densitometry analysis (ImageJ).</li>
+      <li>Advanced 3D molecular modelling in PyMOL for protein structure visualisation and active site mapping of PETase variants; constructed biological interaction networks in Cytoscape for pathway analysis.</li>
+      <li>Data synthesis and presentation using GraphPad Prism (hypothesis testing, non-linear regression, IC50/EC50 curve fitting) and Excel for academic milestone and troubleshooting reviews.</li>
+    </ul>
+  </div>
+
+  <div class="entry">
+    <div class="entry-hd">
+      <div class="entry-left">
+        <div class="entry-title">Applied Cognitive Research — Visitor Behaviour &amp; HRI Study</div>
+        <div class="entry-org">Param Foundation · ParSEC Whitefield, Bengaluru</div>
+        <div class="entry-sub">Conducted independently during Science Communicator role</div>
+      </div>
+      <div class="entry-right"><div class="entry-date">Apr – Jun 2026</div></div>
+    </div>
+    <ul class="bullets">
+      <li><em>Curves of Thought Study (N ≈ 1,568):</em> First-authored naturalistic observational study on schema activation, age-dependent pattern recognition, and visual focal point dependency at the 'Math in Motion' cobot exhibit. Designed three-phase structured protocol, facilitation bias sub-study (4 secondary observers), and hardware modification (focal point bob) grounded in Johansson (1973) point-light research.</li>
+      <li>Identified and documented schema version specificity through the Batman Curve natural experiment — all 15 correct identifications were children with current-era visual exposure; 0 adults correct despite general Batman familiarity. Extends Rosch (1978) prototype theory with a novel age-by-version-exposure interaction.</li>
+      <li><em>Sakura Bloom Demo:</em> Designed a capillary-action crystal exhibit with embedded multi-variable visitor experiment (ammonia × bloom speed; paper type × capillarity; temperature × crystal formation rate) and structured prediction card data collection protocol.</li>
+    </ul>
+  </div>
+
+  <div class="entry">
+    <div class="entry-hd">
+      <div class="entry-left">
+        <div class="entry-title">Volunteer Field Research Assistant</div>
+        <div class="entry-org">Community Research Initiative — Cuttack, Odisha</div>
+      </div>
+      <div class="entry-right"><div class="entry-date">2020 — 2023</div></div>
+    </div>
+    <ul class="bullets">
+      <li>Qualitative field surveys on single-parent households; designed a zonal demographic mapping system across Cuttack to structure community outreach and sociological data collection.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ═══ PROFESSIONAL EXPERIENCE ═══ -->
+<div class="section">
+  <div class="sec-title">Professional Experience</div>
+
+  <div class="entry">
+    <div class="entry-hd">
+      <div class="entry-left">
+        <div class="entry-title">Science Programming Associate</div>
+        <div class="entry-org">Param Foundation · Bengaluru</div>
+        <div class="entry-sub">fmr. Programming POC · promoted 26 Jun 2026</div>
+      </div>
+      <div class="entry-right"><div class="entry-date">26 Jun 2026 — Present</div></div>
+    </div>
+    <ul class="bullets">
+      <li>Quality and pedagogy owner for the centre; manages the full SC team through weekly learning sessions, biweekly mock tours (visitor role), and onboarding/exit regimes for individual visitors and school groups.</li>
+      <li>Authored the ParSEC Biotech Story Arc Proposal (Draft v1.0, 2026) — a five-zone interactive biology gallery ideation document with detailed hardware specifications and visitor experience design.</li>
+    </ul>
+  </div>
+
+  <div class="entry">
+    <div class="entry-hd">
+      <div class="entry-left">
+        <div class="entry-title">Science Communicator</div>
+        <div class="entry-org">Param Foundation · ParSEC Whitefield, Bengaluru</div>
+      </div>
+      <div class="entry-right"><div class="entry-date">Apr 2026 — 25 Jun 2026</div></div>
+    </div>
+    <ul class="bullets">
+      <li>Facilitated live science demonstrations and workshops for public audiences; conducted the Curves of Thought study (N ≈ 1,568) independently across this period.</li>
+      <li>Live operation of Liquid Nitrogen cryogenics, Bernoulli apparatus, Total Internal Reflection rigs, and the Maths in Motion Cobot for general public and school groups.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ═══ TECHNICAL SKILLS ═══ -->
+<div class="section">
+  <div class="sec-title">Technical Skills</div>
+  <div class="skills-grid">
+    <div>
+      <div class="skill-label">Synthetic Biology &amp; Molecular Engineering</div>
+      <div class="skill-list">Lentiviral vector design (pLenti-EF1α-Puro, Addgene) · In-Fusion cloning · Lysosomal targeting constructs (LAMP1 tail, GYEQF sorting signal) · Primer design · Recombinant protein expression · Expression vector engineering</div>
+    </div>
+    <div>
+      <div class="skill-label">Bioanalytical &amp; Biophysical Techniques</div>
+      <div class="skill-list">ELISA · Western Blotting &amp; densitometry (ImageJ) · DNA isolation · PCR &amp; qRT-PCR · Biophysical Techniques (spectroscopy, analytical ultracentrifugation, circular dichroism — theory &amp; interpretation) · Bisulfite sequencing design &amp; analysis</div>
+    </div>
+    <div>
+      <div class="skill-label">Computational &amp; Structural Biology</div>
+      <div class="skill-list">PyMOL (3D protein modelling, active site mapping) · Cytoscape (biological network visualisation) · BLAST · ClustalW · MEGA (phylogenetic analysis) · Bioinformatics Databases &amp; Tools · RasMol · Cn3D</div>
+    </div>
+    <div>
+      <div class="skill-label">Data Analysis &amp; Research Methods</div>
+      <div class="skill-list">GraphPad Prism (hypothesis testing, non-linear regression, IC50/EC50 fitting, publication-grade charting) · ImageJ densitometry · Excel (advanced) · Naturalistic observational study design · Structured behavioural coding · Biostatistics &amp; Scientific Writing</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ LANGUAGES ═══ -->
+<div class="section">
+  <div class="sec-title">Languages</div>
+  <div class="inline-list">
+    <strong>English</strong> — Professional &nbsp;·&nbsp;
+    <strong>Hindi</strong> — Professional &nbsp;·&nbsp;
+    <strong>Odia</strong> — Native
+  </div>
+</div>
+
+<!-- ═══ REFERENCES ═══ -->
+<div class="section">
+  <div class="sec-title">References</div>
+  <div class="inline-list" style="color:var(--muted);font-style:italic;">
+    Available upon request. Academic referees from Pondicherry University Life Sciences Department and Param Foundation.
+  </div>
+</div>
+
+</body>
+</html>

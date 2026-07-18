@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Sitesh Kumar Dash — Biochemist, Molecular Biologist & Science Communicator. CSIR NET JRF (AIR 153). Remac-PET bioremediation & visitor-cognition research at Param Foundation." />
+  <meta name="author" content="Sitesh Kumar Dash" />
+  <meta name="keywords" content="Sitesh Kumar Dash, biochemist, molecular biologist, science communicator, CSIR NET JRF, AIR 153, Remac-PET, bioremediation, PETase, genomics, visitor cognition, Curves of Thought, Param Foundation, ParSEC, Pondicherry University" />
+  <meta name="robots" content="index, follow" />
+  <title>SITESH KUMAR DASH | Mad Scientist Lab</title>
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https://siteshkumardash.vercel.app/" />
+
+  <!-- Open Graph (Facebook · WhatsApp · LinkedIn · Messenger · Instagram · Discord · Slack) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Sitesh Kumar Dash — Mad Scientist Lab" />
+  <meta property="og:title" content="Sitesh Kumar Dash — Biochemist & Molecular Biologist" />
+  <meta property="og:description" content="CSIR NET JRF (AIR 153). Remac-PET enzymatic bioremediation + Curves of Thought visitor-cognition study. Science Programming Associate at Param Foundation." />
+  <meta property="og:url" content="https://siteshkumardash.vercel.app/" />
+  <meta property="og:image" content="https://siteshkumardash.vercel.app/og-preview.png" />
+  <meta property="og:image:secure_url" content="https://siteshkumardash.vercel.app/og-preview.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Sitesh Kumar Dash — Biochemist & Molecular Biologist · CSIR NET JRF AIR 153" />
+  <meta property="og:locale" content="en_US" />
+
+  <!-- Twitter / X Card (works without an account; acts as fallback for other apps) -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Sitesh Kumar Dash — Biochemist & Molecular Biologist" />
+  <meta name="twitter:description" content="CSIR NET JRF (AIR 153). Remac-PET bioremediation + visitor-cognition research. Science Programming Associate at Param Foundation." />
+  <meta name="twitter:image" content="https://siteshkumardash.vercel.app/og-preview.png" />
+  <meta name="twitter:image:alt" content="Sitesh Kumar Dash — Biochemist & Molecular Biologist · CSIR NET JRF AIR 153" />
+
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚗</text></svg>" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#05060c" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <!-- Intro mode detector: decides 3D / 2D-fallback / skip BEFORE effects.js runs -->
+  <script>
+    window.INTRO_MODE = (function () {
+      try {
+        var force = /[?&#]intro\b/i.test(location.href);
+        if (!force && localStorage.getItem("centri_done")) return "skip";
+        if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches)
+          return "skip";
+        // The intro is now a lightweight <video> + 2D canvas — no WebGL needed.
+        return "3d";
+      } catch (e) {
+        return "3d";
+      }
+    })();
+  </script>
+</head>
+<body>
+  <canvas id="dna-bg" aria-hidden="true"></canvas>
+  <canvas id="bio-cursor" aria-hidden="true"></canvas>
+  <div class="screen-overlay" aria-hidden="true"></div>
+
+  <!-- Centrifuge loading overlay (once per session) -->
+  <div id="centrifuge-overlay" aria-hidden="true" role="status">
+    <button id="centri-skip" aria-label="Skip intro">Skip →</button>
+    <canvas id="centrifuge-canvas"></canvas>
+    <div id="centri-log" aria-hidden="true"></div>
+  </div>
+
+  <!-- DNA Helix Scroll Progress Bar -->
+  <div id="dna-scroll-bar" aria-hidden="true" role="presentation">
+    <svg width="32" height="220" viewBox="0 0 32 220" xmlns="http://www.w3.org/2000/svg">
+      <!-- 12 base pairs from bottom (index 0) to top (index 11) -->
+      <g class="dna-bp" data-i="0" style="opacity:0.09">
+        <line x1="4" y1="207" x2="14" y2="207" stroke="#1D9E75" stroke-width="2.5" data-glow fill="none"/>
+        <line x1="18" y1="207" x2="28" y2="207" stroke="#EF9F27" stroke-width="2.5" data-glow fill="none"/>
+        <circle cx="16" cy="207" r="2" fill="#1D9E75" data-glow/>
+      </g>
+      <g class="dna-bp" data-i="1" style="opacity:0.09">
+        <line x1="5" y1="189" x2="14" y2="189" stroke="#00e5ff" stroke-width="2.5" data-glow fill="none"/>
+        <line x1="18" y1="189" x2="27" y2="189" stroke="#D85A30" stroke-width="2.5" data-glow fill="none"/>
+        <circle cx="16" cy="189" r="2" fill="#00e5ff" data-glow/>
+      </g>
+      <g class="dna-bp" data-i="2" style="opacity:0.09">
+        <line x1="4" y1="171" x2="14" y2="171" stroke="#1D9E75" stroke-width="2.5" data-glow fill="none"/>
+        <line x1="18" y1="171" x2="28" y2="171" stroke="#EF9F27" stroke-width="2.5" data-glow fill="none"/>
+        <circle cx="16" cy="171" r="2" fill="#1D9E75" data-glow/>
+      </g>
+      <g class="dna-bp" data-i="3" style="opacity:0.09">
+        <line x1="6" y1="153" x2="14" y2="153" stroke="#00e5ff" stroke-width="2.5" data-glow fill="none"/>
+        <line x1="18" y1="153" x2="26" y2="153" stroke="#D85A30" stroke-width="2.5" data-glow fill="none"/>
+        <circle cx="16" cy="153" r="2" fill="#00e5ff" data-glow/>
+      </g>
+      <g class="dna-bp" data-i="4" style="opacity:0.09">
+        <line x1="4" y1="135" x2="14" y2="135" stroke="#1D9E75" stroke-width="2.5" data-glow fill="none"/>
+        <line x1="18" y1="135" x2="28" y2="135" stroke="#EF9F27" stroke-width="2.5" data-glow fill="none"/>
+        <circle cx="16" cy="135" r="2" fill="#1D9E75" data-glow/>
+      </g>
+      <g class="dna-bp" data-i="5" style="opacity:0.09">
+        <line x1="5" y1="117" x2="14" y2="117" stroke="#00e5ff" stroke-width="2.5" data-glow fill="none"/>
+        <line x1="18" y1="117" x2="27" y2="117" stroke="#D85A30" stroke-width="2.5" data-glow fill="none"/>
+        <circle cx="16" cy="117" r="2" fill="#00e5ff" data-glow/>
+      </g>
+      <g class="dna-bp" data-i="6" style="opacity:0.09">
+        <line x1="4" y1="99" x2="14" y2="99" stroke="#1D9E75" stroke-width="2.5" data-glow fill="none"/>
+        <line x1="18" y1="99" x2="28" y2="99" stroke="#EF9F27" stroke-width="2.5" data-glow fill="none"/>
+        <circle cx="16" cy="99" r="2" fill="#1D9E75" data-glow/>
+      </g>
+      <g class="dna-bp" data-i="7" style="opacity:0.09">
+        <line x1="6" y1="81" x2="14" y2="81" stroke="#00e5ff" stroke-width="2.5" data-glow fill="none"/>
+        <line x1="18" y1="81" x2="26" y2="81" stroke="#D85A30" stroke-width="2.5" data-glow fill="none"/>
+        <circle cx="16" cy="81" r="2" fill="#00e5ff" data-glow/>
+      </g>
+      <g class="dna-bp" data-i="8" style="opacity:0.09">
+        <line x1="4" y1="63" x2="14" y2="63" stroke="#1D9E75" stroke-width="2.5" data-glow fill="none"/>
+        <line x1="18" y1="63" x2="28" y2="63" stroke="#EF9F27" stroke-width="2.5" data-glow fill="none"/>
+        <circle cx="16" cy="63" r="2" fill="#1D9E75" data-glow/>
+      </g>
+      <g class="dna-bp" data-i="9" style="opacity:0.09">
+        <line x1="5" y1="45" x2="14" y2="45" stroke="#00e5ff" stroke-width="2.5" data-glow fill="none"/>
+        <line x1="18" y1="45" x2="27" y2="45" stroke="#D85A30" stroke-width="2.5" data-glow fill="none"/>
+        <circle cx="16" cy="45" r="2" fill="#00e5ff" data-glow/>
+      </g>
+      <g class="dna-bp" data-i="10" style="opacity:0.09">
+        <line x1="4" y1="27" x2="14" y2="27" stroke="#1D9E75" stroke-width="2.5" data-glow fill="none"/>
+        <line x1="18" y1="27" x2="28" y2="27" stroke="#EF9F27" stroke-width="2.5" data-glow fill="none"/>
+        <circle cx="16" cy="27" r="2" fill="#1D9E75" data-glow/>
+      </g>
+      <g class="dna-bp" data-i="11" style="opacity:0.09">
+        <line x1="5" y1="10" x2="14" y2="10" stroke="#00e5ff" stroke-width="2.5" data-glow fill="none"/>
+        <line x1="18" y1="10" x2="27" y2="10" stroke="#D85A30" stroke-width="2.5" data-glow fill="none"/>
+        <circle cx="16" cy="10" r="2" fill="#00e5ff" data-glow/>
+      </g>
+      <!-- Backbone strands -->
+      <polyline points="11,10 9,27 7,45 8,63 9,81 8,99 7,117 8,135 9,153 8,171 7,189 8,207" fill="none" stroke="rgba(29,158,117,0.25)" stroke-width="1.5"/>
+      <polyline points="21,10 23,27 25,45 24,63 23,81 24,99 25,117 24,135 23,153 24,171 25,189 24,207" fill="none" stroke="rgba(239,159,39,0.25)" stroke-width="1.5"/>
+    </svg>
+    <div id="dna-complete-label">COMPLETE</div>
+  </div>
+
+  <header class="top">
+    <div class="top-inner">
+      <a class="logo" href="#core">SKD<span class="status-light" aria-hidden="true"></span></a>
+      <button class="nav-toggle" aria-label="Menu" aria-expanded="false">≡</button>
+      <nav class="nav">
+        <a href="#about" data-detail="about">About</a>
+        <a href="#research" data-detail="research">Research</a>
+        <a href="#experience" data-detail="experience">Work</a>
+        <a href="#education" data-detail="education">Education</a>
+        <a href="#skills" data-detail="skills">Skills</a>
+        <a href="#ambition" data-detail="ambition">Ambition</a>
+        <a href="#achieve" data-detail="achieve">Awards</a>
+        <a href="#life" data-detail="life">Life</a>
+        <a href="#contact" data-detail="contact">Contact</a>
+      </nav>
+      <div class="header-right">
+        <span class="brand-mark">AI BIODESIGNER</span>
+        <div class="social-icons" aria-label="Social links">
+          <a href="https://www.linkedin.com/in/d-sitesh" target="_blank" rel="noopener" class="social-icon" aria-label="LinkedIn" title="LinkedIn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          </a>
+          <a href="https://github.com/siteshkumardash" target="_blank" rel="noopener" class="social-icon" aria-label="GitHub" title="GitHub">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="mol-graph" id="top">
+    <div class="dna-spine" aria-hidden="true">
+      <canvas id="dna-spine"></canvas>
+    </div>
+    <svg class="mol-bonds" aria-hidden="true"></svg>
+
+    <div class="mol-layout">
+    <div class="mol-col mol-left">
+    <article class="mol-node" id="about" data-node="about" data-side="left" data-bond="covalent" data-detail="about">
+      <div class="mol-wrap shape-benzene">
+        <svg class="mol-outline" viewBox="0 0 200 180" aria-hidden="true">
+          <polygon points="100,10 175,52 175,128 100,170 25,128 25,52" fill="none" stroke="currentColor" stroke-width="1.2"/>
+          <circle cx="100" cy="90" r="28" fill="none" stroke="currentColor" stroke-width="0.8" opacity="0.5"/>
+        </svg>
+        <button type="button" class="mol-inner mol-trigger" aria-label="About details">
+          <h2>About</h2>
+          <p class="overview">GDP/ALCOA++ · macromolecular assays · science communication</p>
+          <span class="tap-hint">Decode Profile →</span>
+        </button>
+      </div>
+    </article>
+
+    <article class="mol-node" id="experience" data-node="experience" data-side="left" data-bond="peptide" data-detail="experience">
+      <div class="mol-wrap shape-flask">
+        <svg class="mol-outline" viewBox="0 0 160 200" aria-hidden="true">
+          <path d="M55,12 H105 V70 L130,175 H30 L55,70Z" fill="none" stroke="currentColor" stroke-width="1.2"/>
+        </svg>
+        <button type="button" class="mol-inner mol-trigger" aria-label="Experience details">
+          <h2>Experience</h2>
+          <p class="overview">Science Programming Associate / Programming PoC · Science Communicator</p>
+          <span class="tap-hint">Catalytic Record →</span>
+        </button>
+      </div>
+    </article>
+
+    <article class="mol-node" id="skills" data-node="skills" data-side="left" data-bond="hydrogen" data-detail="skills">
+      <div class="mol-wrap shape-sheet">
+        <svg class="mol-outline" viewBox="0 0 220 140" aria-hidden="true">
+          <polygon points="20,30 180,10 200,110 40,130" fill="none" stroke="currentColor" stroke-width="1.2"/>
+        </svg>
+        <button type="button" class="mol-inner mol-trigger" aria-label="Skills details">
+          <h2>Skills</h2>
+          <p class="overview">PCR · SDS-PAGE · BLAST/PDB · PyMOL · GDP/cGMP</p>
+          <span class="tap-hint">Molecular Arsenal →</span>
+        </button>
+      </div>
+    </article>
+
+    <article class="mol-node" id="achieve" data-node="achieve" data-side="left" data-bond="ionic" data-detail="achieve">
+      <div class="mol-wrap shape-cyclo">
+        <svg class="mol-outline" viewBox="0 0 200 160" aria-hidden="true">
+          <polygon points="50,45 100,20 150,45 150,95 100,120 50,95" fill="none" stroke="currentColor" stroke-width="1.2"/>
+        </svg>
+        <button type="button" class="mol-inner mol-trigger" aria-label="Achievements details">
+          <h2>Achievements</h2>
+          <p class="overview">CSIR JRF AIR 153 · MicCon24 · NISER PhD finals</p>
+          <span class="tap-hint">Breakthrough Discoveries →</span>
+        </button>
+      </div>
+    </article>
+    </div>
+
+    <div class="mol-col mol-center">
+    <article class="mol-node mol-core" id="core" data-node="core" data-detail="core">
+      <div class="mol-wrap shape-porphyrin">
+        <svg class="mol-outline" viewBox="0 0 200 200" aria-hidden="true">
+          <polygon points="100,12 168,48 168,120 100,156 32,120 32,48" fill="none" stroke="currentColor" stroke-width="1.2"/>
+          <circle cx="100" cy="84" r="42" fill="none" stroke="currentColor" stroke-width="0.9" opacity="0.6"/>
+          <circle cx="100" cy="84" r="8" fill="currentColor" opacity="0.35"/>
+        </svg>
+        <button type="button" class="mol-inner mol-trigger" aria-label="Open profile details">
+          <div class="core-headshot">
+            <div class="hex-glow-ring" aria-hidden="true"></div>
+            <img src="headshot.png" alt="Sitesh Kumar Dash" class="headshot-img" onerror="this.style.display='none'" />
+            <div class="headshot-fallback">SKD</div>
+          </div>
+          <p class="badge">CSIR NET JRF · AIR 153</p>
+          <h1 class="mol-name glitch-name" data-text="SITESH KUMAR DASH">SITESH KUMAR DASH</h1>
+          <p class="roles">BIOCHEMIST · MOLECULAR BIOLOGIST · SCIENCE COMMUNICATOR</p>
+          <p class="overview">Genomics · Wet-lab · Visitor cognition</p>
+          <span class="tap-hint">Decode Genome →</span>
+        </button>
+      </div>
+    </article>
+
+    <article class="mol-node mol-contact" id="contact" data-node="contact" data-side="center" data-bond="peptide" data-detail="contact">
+      <div class="mol-wrap shape-phospho">
+        <svg class="mol-outline" viewBox="0 0 160 200" aria-hidden="true">
+          <circle cx="80" cy="48" r="36" fill="none" stroke="currentColor" stroke-width="1.2"/>
+          <path d="M55,82 Q80,120 105,82 L80,185Z" fill="none" stroke="currentColor" stroke-width="1"/>
+        </svg>
+        <button type="button" class="mol-inner mol-trigger" aria-label="Contact details">
+          <h2>Contact</h2>
+          <p class="overview">sitesh@paraminnovation.org · dsitesh2003@gmail.com · LinkedIn</p>
+          <span class="tap-hint">Catalyze Synergy →</span>
+        </button>
+      </div>
+    </article>
+    </div>
+
+    <div class="mol-col mol-right">
+    <article class="mol-node" id="research" data-node="research" data-side="right" data-bond="double" data-detail="research">
+      <div class="mol-wrap shape-helix">
+        <svg class="mol-outline" viewBox="0 0 120 220" aria-hidden="true">
+          <path d="M60,8 C95,40 95,180 60,212 C25,180 25,40 60,8Z" fill="none" stroke="currentColor" stroke-width="1.2"/>
+        </svg>
+        <button type="button" class="mol-inner mol-trigger" aria-label="Research details">
+          <h2>Research</h2>
+          <p class="overview">Remac-PET · FAST-PETase N233K · BBB·ROS·epigenetics</p>
+          <span class="tap-hint">Primary Pathway →</span>
+        </button>
+      </div>
+    </article>
+
+    <article class="mol-node" id="education" data-node="education" data-side="right" data-bond="ionic" data-detail="education">
+      <div class="mol-wrap shape-purine">
+        <svg class="mol-outline" viewBox="0 0 200 170" aria-hidden="true">
+          <polygon points="70,20 130,20 155,55 130,90 70,90 45,55" fill="none" stroke="currentColor" stroke-width="1.2"/>
+          <polygon points="55,75 100,75 120,115 100,155 55,155 35,115" fill="none" stroke="currentColor" stroke-width="1"/>
+        </svg>
+        <button type="button" class="mol-inner mol-trigger" aria-label="Education details">
+          <h2>Education</h2>
+          <p class="overview">M.Sc. Biochem/MolBio · B.Sc. Zoology·Chem·Botany</p>
+          <span class="tap-hint">Genetic Foundation →</span>
+        </button>
+      </div>
+    </article>
+
+    <article class="mol-node" id="ambition" data-node="ambition" data-side="right" data-bond="double" data-detail="ambition">
+      <div class="mol-wrap shape-mito">
+        <svg class="mol-outline" viewBox="0 0 200 120" aria-hidden="true">
+          <ellipse cx="100" cy="60" rx="88" ry="48" fill="none" stroke="currentColor" stroke-width="1.2"/>
+        </svg>
+        <button type="button" class="mol-inner mol-trigger" aria-label="Ambition details">
+          <h2>Ambition</h2>
+          <p class="overview">Ashram-hospitals · living labs · Remac-PET thesis</p>
+          <span class="tap-hint">Evolutionary Vector →</span>
+        </button>
+      </div>
+    </article>
+
+    <article class="mol-node" id="life" data-node="life" data-side="right" data-bond="hydrogen" data-detail="life">
+      <div class="mol-wrap shape-vesicle">
+        <svg class="mol-outline" viewBox="0 0 200 150" aria-hidden="true">
+          <circle cx="65" cy="75" r="38" fill="none" stroke="currentColor" stroke-width="1"/>
+          <circle cx="115" cy="55" r="32" fill="none" stroke="currentColor" stroke-width="1"/>
+        </svg>
+        <button type="button" class="mol-inner mol-trigger" aria-label="Beyond bench details">
+          <h2>Beyond Bench</h2>
+          <p class="overview">Experimentation · narrative science · athletics · media</p>
+          <span class="tap-hint">Phenotypic Expression →</span>
+        </button>
+      </div>
+    </article>
+
+    </div>
+    </div>
+  </main>
+
+
+
+  <footer class="foot">
+    <div class="foot-inner">
+      <span class="foot-copy"><span class="copyright-symbol">©</span> <span class="copyright-name">SITESH KUMAR DASH</span></span>
+      <div class="foot-bio-time-wrap">
+        <time id="bio-clock" class="bio-clock" datetime="">φ = — · τ_local = —:—:— · IST</time>
+        <span class="foot-rule" aria-hidden="true"></span>
+      </div>
+      <span class="formula"><span class="formula-reactant">Plastic</span> + <span class="formula-enzyme">PETase(N233K)</span> → <span class="formula-product">Remac-PET</span> · <span class="formula-rescue">BDNF rescue</span> <span class="lightning-glow">⚡</span></span>
+    </div>
+  </footer>
+
+  <!-- Detail screens -->
+  <div class="detail-screen" id="detail-screen" aria-hidden="true">
+    <div class="detail-backdrop" data-close></div>
+    <div class="detail-panel" role="dialog" aria-modal="true" aria-labelledby="detail-title">
+      <button type="button" class="detail-close" aria-label="Close">×</button>
+      <div class="detail-content" id="detail-content"></div>
+    </div>
+  </div>
+
+  <template id="detail-core">
+    <h2 id="detail-title" class="detail-title" style="color: #39ff14; font-size: clamp(1.4rem, 8vw, 1.8rem); letter-spacing: -0.01em; text-transform: uppercase; margin-bottom: 0.5rem; white-space: nowrap;">Molecular Architect</h2>
+    <!-- Interactive plasmid / genome map — hover a feature, click to open that section -->
+    <div class="plasmid-wrap">
+      <canvas id="plasmid-canvas" role="img" aria-label="Genome map of this site. Each feature is a section — use the links below to open one."></canvas>
+      <div id="plasmid-tip" class="plasmid-tip" aria-hidden="true"></div>
+      <p class="plasmid-caption">pSKD&nbsp;·&nbsp;9 features&nbsp;·&nbsp;hover an arc, click to decode</p>
+    </div>
+    <nav class="plasmid-nav" aria-label="Site sections">
+      <a href="#research" data-detail="research">Research</a>
+      <a href="#about" data-detail="about">Profile</a>
+      <a href="#experience" data-detail="experience">Experience</a>
+      <a href="#education" data-detail="education">Education</a>
+      <a href="#skills" data-detail="skills">Skills</a>
+      <a href="#achieve" data-detail="achieve">Awards</a>
+      <a href="#ambition" data-detail="ambition">Ambition</a>
+      <a href="#life" data-detail="life">Beyond Bench</a>
+      <a href="#contact" data-detail="contact">Contact</a>
+    </nav>
+    <div class="microscope-reveal">
+      <p class="detail-lead" style="font-size: clamp(0.7rem, 2.5vw, 0.9rem);">Biochemist · Molecular Biologist · Science Communicator · CSIR NET JRF (AIR 153)</p>
+      <p>Science Programming Associate / Programming PoC · Param Foundation, Bengaluru · Base: Cuttack, Odisha</p>
+      <p>Bridging the lab bench and the gallery floor—from molecular structures to live visitor cognition. CSIR NET JRF qualified biochemist leading programming quality, pedagogy, and people at Param Foundation.</p>
+      <h3>Contact</h3>
+      <p><a href="mailto:dsitesh2003@gmail.com">dsitesh2003@gmail.com</a> · <a href="tel:+919566513307">+91 95665 13307</a></p>
+      <p><a href="https://www.linkedin.com/in/d-sitesh" target="_blank" rel="noopener">linkedin.com/in/d-sitesh</a></p>
+      <div style="margin-top:1.2rem; display:flex; gap:0.6rem; flex-wrap:wrap; align-items:center;">
+        <a href="portfolio-cv.html" target="_blank" rel="noopener" class="btn-cv" aria-label="Open portfolio CV">
+          ⬇ Portfolio CV
+        </a>
+        <a href="academic-cv.html" target="_blank" rel="noopener" class="btn-cv" aria-label="Open academic CV">
+          ⬇ Academic CV
+        </a>
+        <a href="https://github.com/siteshkumardash" target="_blank" rel="noopener" class="btn-cv btn-cv-ghost">GitHub</a>
+      </div>
+    </div>
+  </template>
+
+  <template id="detail-about">
+    <h2 id="detail-title" class="detail-title" style="color: #00e5ff;">Biochemical Profile</h2>
+    <p style="font-size:0.72rem; color:rgba(238,242,255,0.55); margin:0 0 0.4rem;">Ramachandran plot — each residue is a facet of how I work, sitting in its favoured region. Hover a point.</p>
+    <div class="chart-wrap">
+      <canvas id="rama-canvas"></canvas>
+      <div id="rama-tip" class="plasmid-tip" aria-hidden="true"></div>
+    </div>
+    <div class="microscope-reveal">
+      <div class="detail-vignette" aria-hidden="true"></div>
+      <p>CSIR NET JRF qualified biochemist at the intersection of molecular science and public engagement. Rapid, independent problem-solver combining academic laboratory discipline with computational logic—reproducible molecular workflows, macromolecular analysis, and Good Documentation Practices (GDP/ALCOA++).</p>
+      <p>Now <strong>Science Programming Associate</strong> at Param Foundation (Bengaluru)—owning programming quality, pedagogy, and people; treating the science floor as a behavioural lab and the visitor as a cognitive subject. Live operation of LN₂ cryogenics, Bernoulli, total internal reflection, and cobot exhibits.</p>
+      <p>Committed to scientific integrity; developing the independent <strong>Remac-PET System</strong> (enzymatic PET bioremediation) and the <strong>Curves of Thought</strong> visitor-cognition study as active research lines toward a PhD.</p>
+    </div>
+  </template>
+
+  <template id="detail-research">
+    <canvas id="research-cells-canvas" style="position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; opacity: 0.4; pointer-events: none;"></canvas>
+    <h2 id="detail-title" class="detail-title" style="color: #39ff14; position: relative; z-index: 1;">Active Pathway: Remac-PET</h2>
+    <div class="microscope-reveal" style="position:relative; z-index: 1;">
+      <div class="detail-vignette" aria-hidden="true"></div>
+      <p class="detail-lead">Engineering Macrophages for Multi-Scale Bioremediation of Micro- &amp; Nanoplastics</p>
+      <div style="margin: 0.5rem 0; padding: 0.5rem; border-left: 2px solid #ff9f43; background: rgba(255, 159, 67, 0.1);">
+        <strong>Stage:</strong> Independently developed proposal / manuscript in preparation · seeking PhD placement
+      </div>
+      <h3>Problem</h3>
+      <p>Micro- &amp; nanoplastics (MNPs) are detectable in every major human organ — the prefrontal cortex reached a median <strong>4,917 µg/g in 2024, up 47% from 2016</strong> (Nihart &amp; Campen et al., <em>Nature Medicine</em> 2025). Nanoplastics cross the blood-brain barrier, drive ROS-mediated mitochondrial dysfunction, saturate microglia (frustrated phagocytosis), and leave a transgenerational epigenetic scar via BDNF promoter IV hypermethylation. No therapy reverses this bioaccumulation.</p>
+      <h3>Mechanism</h3>
+      <p>Vpx-packaged lentiviral transduction (overcoming SAMHD1 restriction in myeloid cells) of THP-1 monocytes with an <strong>[Igκ-Leader]–[FAST-PETase N233K…]–[LAMP1 tail]</strong> fusion under an EF1α promoter. The LAMP1 GYEQF sorting signal targets enzymatic activity to the lysosome — exactly where phagocytosed MNPs reside — hydrolysing PET to EG + TPA monomers.</p>
+      <h3>Research Objectives</h3>
+      <div class="objectives">
+        <div class="objective"><span class="obj-tag" style="color:#00e5ff;border-color:#00e5ff;">Aim 1</span><p>Molecular engineering &amp; acid-tolerance validation of the Lyso-PETase fusion at lysosomal pH 4.5; yeast surface-display directed-evolution screen (~10⁵ variants).</p></div>
+        <div class="objective"><span class="obj-tag" style="color:#39ff14;border-color:#39ff14;">Aim 2</span><p>Generate &amp; characterise the Remac-PET cell line; lysosomal co-localisation (target PCC &gt; 0.75); HPLC-MS quantification of EG &amp; TPA degradation products at 24 &amp; 72 h.</p></div>
+        <div class="objective"><span class="obj-tag" style="color:#ff9f43;border-color:#ff9f43;">Aim 3</span><p>Transwell neuroprotection assay (Remac-PET / SH-SY5Y); BDNF-promoter bisulfite sequencing &amp; ChIP-qPCR (H3K27me3); LDH, JC-1, CellROX &amp; Caspase-Glo readouts.</p></div>
+      </div>
+      <h3>Impact</h3>
+      <p>Clear intracellular plastic reservoirs, halt direct neurotoxicity, and test whether MNP clearance <strong>rescues BDNF epigenetic damage</strong> — a novel, testable mechanistic claim with no published precedent.</p>
+      <h3>Key References</h3>
+      <ul style="font-size: 0.8rem; color: #a0a8c0;">
+        <li>Nihart, Campen et al. (2025). <em>Bioaccumulation of microplastics in human brain.</em> Nature Medicine.</li>
+        <li>Lu et al. (2022). <em>Machine learning-aided engineering of hydrolases for PET depolymerization.</em> Nature.</li>
+        <li>Yoshida et al. (2016). <em>A bacterium that degrades and assimilates PET</em> (Ideonella sakaiensis). Science.</li>
+      </ul>
+    </div>
+    <h3>Remac-PET Pathway</h3>
+    <div class="remac-pathway" id="remac-pathway"></div>
+    <div class="pathway-legend">
+      <span class="legend-item"><span class="legend-dot" style="background: #00e5ff;"></span>Transduction</span>
+      <span class="legend-item"><span class="legend-dot" style="background: #ff9f43;"></span>Phagocytosis</span>
+      <span class="legend-item"><span class="legend-dot" style="background: #b44dff;"></span>Degradation</span>
+      <span class="legend-item"><span class="legend-dot" style="background: #39ff14;"></span>Rescue</span>
+    </div>
+
+    <h3>Degradation Kinetics</h3>
+    <p style="font-size:0.72rem; color:rgba(238,242,255,0.55); margin:0 0 0.4rem;">FAST-PETase (N233K) hydrolysis — nanoplastic clears as monomers (TPA + EG) accumulate. Hover to read concentrations.</p>
+    <div class="chart-wrap">
+      <canvas id="kinetics-canvas"></canvas>
+      <div id="kinetics-tip" class="plasmid-tip" aria-hidden="true"></div>
+    </div>
+  </template>
+
+  <template id="detail-experience">
+    <h2 id="detail-title" class="detail-title" style="color: #ff9f43;">Catalytic Milestones</h2>
+    <p style="font-size:0.72rem; color:rgba(238,242,255,0.55); margin:0 0 0.4rem;">Career as a growth curve — lag → log → stationary. Hover a point for the role.</p>
+    <div class="chart-wrap">
+      <canvas id="growth-canvas"></canvas>
+      <div id="growth-tip" class="plasmid-tip" aria-hidden="true"></div>
+    </div>
+    <div class="microscope-reveal">
+      <div class="detail-vignette" aria-hidden="true"></div>
+      <div class="detail-block">
+        <h3>Science Programming Associate / Programming PoC · Param Foundation</h3>
+        <p class="detail-meta">Bengaluru · 26 Jun 2026 – Present · ParSEC</p>
+        <p>Quality &amp; pedagogy owner for the centre and people manager for the full Science Communicator team — gallery rounds, in-session observations, weekly learning sessions, biweekly mock tours, and the weekly programming schedule. Single point of contact syncing with HQ and the Event, Research, Exhibit &amp; Marketing functions. Authored the ParSEC Biotech Story Arc proposal (five-zone interactive biology gallery).</p>
+      </div>
+      <div class="detail-block">
+        <h3>Science Communicator · Param Foundation (ParSEC Whitefield)</h3>
+        <p class="detail-meta">Bengaluru · Apr 2026 – 25 Jun 2026</p>
+        <p>Live LN₂ cryogenics, Bernoulli, total-internal-reflection and cobot demonstrations for school and corporate audiences. First-authored the <em>Curves of Thought</em> visitor-cognition study (N ≈ 1,568) and designed the Sakura Bloom multi-variable demo.</p>
+      </div>
+      <div class="detail-block">
+        <h3>M.Sc. Graduate Researcher · Pondicherry University</h3>
+        <p class="detail-meta">Oct 2023 – May 2025</p>
+        <p>Conceptualised the Remac-PET System; expression-vector engineering, ELISA &amp; Western blotting; 3D molecular modelling (PyMOL), network analysis (Cytoscape) and IC50 fitting (GraphPad Prism).</p>
+      </div>
+    </div>
+  </template>
+
+  <template id="detail-education">
+    <div class="edu-ecg-screen" id="eduEcgScreen">
+      <!-- Header bar -->
+      <div class="edu-ecg-topbar">
+        <span class="edu-ecg-title-top">EDUCATIONAL PATHWAY &amp; MILESTONES</span>
+        <span class="edu-live-badge"><span class="edu-live-dot"></span>LIVE TRACE</span>
+      </div>
+
+      <!-- Canvas strip -->
+      <div class="edu-canvas-wrap" id="eduCanvasWrap">
+        <canvas id="eduEcgCanvas" class="edu-ecg-canvas"></canvas>
+        <!-- Spike hover tooltip -->
+        <div class="edu-tooltip" id="eduTooltip"></div>
+      </div>
+
+      <!-- Clicked milestone info box -->
+      <div class="edu-info-box" id="eduInfoBox" aria-live="polite"></div>
+
+      <!-- Core Competencies -->
+      <div class="edu-competencies">
+        <div class="edu-comp-heading">CORE COMPETENCIES</div>
+        <div class="edu-comp-grid">
+          <div class="edu-comp-group">
+            <div class="edu-comp-head">&#x2B21; Wet-Lab</div>
+            <span class="edu-tag">PCR / qPCR</span><span class="edu-tag">SDS-PAGE</span>
+            <span class="edu-tag">Agarose Gel</span><span class="edu-tag">DNA/RNA Extraction</span>
+            <span class="edu-tag">UV-Vis Spectrophotometry</span><span class="edu-tag">Centrifugation</span>
+            <span class="edu-tag">Microscopy</span><span class="edu-tag">Peptide Chemistry</span>
+          </div>
+          <div class="edu-comp-group">
+            <div class="edu-comp-head">&#x2B21; Computational</div>
+            <span class="edu-tag">BLAST / ClustalW</span><span class="edu-tag">PyMOL</span>
+            <span class="edu-tag">NCBI / PDB</span><span class="edu-tag">Cytoscape</span>
+            <span class="edu-tag">GraphPad Prism</span><span class="edu-tag">ImageJ</span>
+          </div>
+          <div class="edu-comp-group">
+            <div class="edu-comp-head">&#x2B21; Quality &amp; GLP</div>
+            <span class="edu-tag hi">GDP / ALCOA++</span><span class="edu-tag hi">cGMP / ICH</span>
+            <span class="edu-tag hi">RCA</span><span class="edu-tag">ISO 13485 (theory)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <template id="detail-skills">
+    <h2 id="detail-title" class="detail-title" style="color: #b44dff;">SDS-PAGE Skills Analysis</h2>
+    <p style="font-size:0.72rem;color:rgba(238,242,255,0.55);margin:0 0 0.5rem;">Hover over a band to see skill level. Top = expert proficiency.</p>
+    <div class="sds-gel-wrap">
+      <canvas id="sds-canvas"></canvas>
+    </div>
+    <!-- Shared floating tooltip (outside canvas) -->
+    <div id="sds-tip"></div>
+    <div class="sds-legend">
+      <span class="sds-legend-item"><span class="sds-legend-dot" style="background:#00e5ff;color:#00e5ff;"></span>Molecular Techniques</span>
+      <span class="sds-legend-item"><span class="sds-legend-dot" style="background:#39ff14;color:#39ff14;"></span>Bioinformatics</span>
+      <span class="sds-legend-item"><span class="sds-legend-dot" style="background:#EF9F27;color:#EF9F27;"></span>Science Comm.</span>
+      <span class="sds-legend-item"><span class="sds-legend-dot" style="background:#b44dff;color:#b44dff;"></span>Research</span>
+    </div>
+  </template>
+
+  <template id="detail-ambition">
+    <h2 id="detail-title" class="detail-title" style="color: #b44dff;">Evolutionary Vector</h2>
+    <p>Establish a network of self-sustaining cooperative ashrams and integrated hospitals—sweat-equity micro-economies where residents contribute through agriculture, cottage industries, and facility maintenance in exchange for healthcare and shelter.</p>
+    <p>Integrate life-science exhibits and living laboratories; use science education to empower society's most vulnerable while preserving dignity and purpose.</p>
+    <p>Core research commitment: independent <strong>Remac-PET</strong> thesis on neurotoxicity and bioremediation.</p>
+    <h3>System Map</h3>
+    <p style="font-size:0.72rem; color:rgba(238,242,255,0.55); margin:0 0 0.4rem;">How the pieces feed each other. Hover a node.</p>
+    <div class="chart-wrap">
+      <canvas id="systems-canvas"></canvas>
+      <div id="systems-tip" class="plasmid-tip" aria-hidden="true"></div>
+    </div>
+  </template>
+
+  <template id="detail-achieve">
+    <div style="position:absolute; top:-10px; left:-10px; width:100%; height:190px; z-index:0; overflow:hidden; border-radius:12px;">
+      <canvas id="achieve-canvas" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:auto; opacity:0.95; cursor:pointer;"></canvas>
+      <div id="bell-counter" style="position:absolute; top:70px; right:50px; color:#ff3366; font-family:'JetBrains Mono',monospace; font-size:1.8rem; font-weight:bold; text-shadow:0 0 10px #ff3366;"></div>
+    </div>
+    <h2 id="detail-title" class="detail-title" style="color: #39ff14; position:relative; z-index:1; margin-top:170px;">Landmark Mutations</h2>
+    <ul style="position:relative; z-index:1; margin-bottom: 0;">
+      <li><strong>CSIR NET JRF (AIR 153)</strong> — Joint CSIR-UGC NET, June 2025; qualified for Junior Research Fellowship &amp; Assistant Professorship in Life Sciences.</li>
+      <li><strong>MicCon24</strong> — International Conference on Recent Trends in Microbiology. Presented poster on microbial dynamics and novel screening methods.</li>
+      <li><strong>NISER PhD programme</strong> — Advanced to final selection round; shortlisted for the panel interview covering molecular genetics and biophysics.</li>
+    </ul>
+  </template>
+
+
+  <template id="detail-life">
+    <h2 id="detail-title" class="detail-title" style="color: #ff9f43;">Phenotypic Expression</h2>
+    <p style="font-size:0.72rem; color:rgba(238,242,255,0.55); margin:0 0 0.4rem;">2-D gel — each spot is an interest; bigger &amp; brighter = more strongly expressed. Hover a spot.</p>
+    <div class="chart-wrap">
+      <canvas id="gel2d-canvas"></canvas>
+      <div id="gel2d-tip" class="plasmid-tip" aria-hidden="true"></div>
+    </div>
+    <ul>
+      <li>Fearless experimentation—in lab, demos, and daily life</li>
+      <li>Imaginative science storytelling</li>
+      <li>Dermatological biochemistry (salicylic acid, niacinamide actives)</li>
+      <li>High-performance PC hardware · competitive BGMI</li>
+      <li>Badminton — Odisha Inter Badminton Tournament (OIBT2025)</li>
+      <li>Anime: Naruto, Jujutsu Kaisen</li>
+      <li>Languages: English, Hindi, Odia (professional fluency)</li>
+    </ul>
+  </template>
+
+  <template id="detail-contact">
+    <div style="position:absolute; inset:0; z-index:0; overflow:hidden; border-radius:12px;">
+      <canvas id="synapse-canvas" style="position:absolute; inset:0; width:100%; height:100%; pointer-events:none; opacity:0.7;"></canvas>
+    </div>
+    <h2 id="detail-title" class="detail-title" style="color: #00e5ff; position:relative; z-index:1;">Catalyze Exchange</h2>
+    <p class="detail-lead" style="position:relative; z-index:1;">Sustainable, science-backed societal impact-one experiment at a time.</p>
+    
+    <h3>Direct Contact</h3>
+    <p><strong>Work:</strong> <a href="mailto:sitesh@paraminnovation.org">sitesh@paraminnovation.org</a></p>
+    <p><strong>Personal:</strong> <a href="mailto:dsitesh2003@gmail.com">dsitesh2003@gmail.com</a></p>
+    <p><a href="https://www.linkedin.com/in/d-sitesh" target="_blank" rel="noopener">LinkedIn</a></p>
+    
+    <h3>Quick Message</h3>
+    <div style="position:relative; overflow:hidden; border-radius:12px; padding-bottom:8px;">
+      <canvas id="pcr-canvas" class="pcr-overlay" aria-hidden="true"></canvas>
+      <form id="contact-form" class="contact-form" style="position:relative; z-index:1;">
+        <input type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute; left:-9999px; width:0; height:0; opacity:0;" />
+        <div class="form-group">
+        <label for="contact-name">Name</label>
+        <input type="text" id="contact-name" name="name" placeholder="Your name" required />
+      </div>
+      <div class="form-group">
+        <label for="contact-email">Email</label>
+        <input type="email" id="contact-email" name="email" placeholder="your@email.com" required />
+      </div>
+      <div class="form-group">
+        <label for="contact-subject">Subject</label>
+        <input type="text" id="contact-subject" name="subject" placeholder="What's this about?" required />
+      </div>
+      <div class="form-group">
+        <label for="contact-message">Message</label>
+        <textarea id="contact-message" name="message" placeholder="Your message..." rows="3" required></textarea>
+      </div>
+      <button type="submit" class="btn-submit">Send Message</button>
+      <p class="form-note" id="form-note"></p>
+    </form>
+    <div id="contact-success" class="contact-success" style="display:none; position:relative; z-index:1; text-align:center; padding:2rem 1rem;">
+      <div class="success-icon" style="font-size:3rem; margin-bottom:1rem; color: #39ff14;">✓</div>
+      <h3 style="color: #00e5ff; margin-bottom: 0.5rem;">Your contact has been initialized</h3>
+      <p style="color: rgba(220,228,255,0.78); font-size: 0.9rem; margin-bottom: 1.5rem;">Transmission sent successfully. I will get back to you soon.</p>
+      <button type="button" class="btn-submit btn-go-back" style="background: rgba(0, 229, 255, 0.1); border-color: rgba(0, 229, 255, 0.5); color: #00e5ff;">Go Back</button>
+    </div>
+    </div>
+  </template>
+
+  <script src="script.js"></script>
+  <script src="effects.js"></script>
+  <!-- DNA intro (pure 2D canvas, no dependencies). Runs only when INTRO_MODE==='3d'. -->
+  <script src="intro3d.js"></script>
+  <script>
+  /* ===================================================
+     EDUCATION ECG — fires only when Education detail opens
+     Education-only timeline, colourful spikes, hover + click
+  =================================================== */
+  (function() {
+    const MILESTONES = [
+      {
+        id: 'bsc',
+        label: 'B.Sc.',
+        sublabel: 'Zoology · Chem · Botany',
+        year: '2020–23',
+        h: 1.2,
+        color: '#00e5ff',
+        info: {
+          title: 'B.Sc. — Zoology (Hons), Chemistry, Botany',
+          inst:  'S.V.M. College (Autonomous), Jagatsinghpur · Utkal University · 2020–2023',
+          grade: 'First Class Distinction · 8.82 CGPA',
+          body:  'Multidisciplinary science foundation across zoological systems, chemical analysis, and botanical studies. Built strong wet-lab instincts, microscopy, and field-ecology skills.',
+          tags:  ['Zoology (Hons)', 'Chemistry', 'Botany', 'Ecology', 'Microscopy'],
+          highlight: '8.82 CGPA · Distinction'
+        }
+      },
+      {
+        id: 'cuet',
+        label: 'CUET PG',
+        sublabel: 'Qualified',
+        year: '2023',
+        h: 2.2,
+        color: '#ff9f43',
+        info: {
+          title: 'CUET PG — Qualified',
+          inst:  'Central Universities Common Entrance Test · 2023',
+          grade: 'Qualified for M.Sc. admission',
+          body:  'Cleared CUET PG during the final year of B.Sc., securing admission to M.Sc. Biochemistry & Molecular Biology at Pondicherry University.',
+          tags:  ['Entrance Exam', 'CUET PG', 'Central University'],
+          highlight: 'Qualified'
+        }
+      },
+      {
+        id: 'msc',
+        label: 'M.Sc.',
+        sublabel: 'Biochem · MolBio',
+        year: '2023–25',
+        h: 1.8,
+        color: '#b44dff',
+        info: {
+          title: 'M.Sc. — Biochemistry & Molecular Biology',
+          inst:  'Pondicherry University · 2023–2025',
+          grade: 'First Class · 6.07 CGPA',
+          body:  'Advanced training in molecular genetics, bioinformatics, genomics, structural biology, and biophysics. Developed independent assay design, GDP/ALCOA++ lab records, and bioinformatics workflows.',
+          tags:  ['Biochemistry', 'Molecular Biology', 'Genomics', 'Bioinformatics', 'Biophysics', 'GDP/ALCOA++', 'RCA'],
+          highlight: 'First Class'
+        }
+      },
+      {
+        id: 'miccon',
+        label: 'MicCon24',
+        sublabel: 'Intl. Conference',
+        year: '2024',
+        h: 2.5,
+        color: '#39ff14',
+        info: {
+          title: 'MicCon24 — International Microbiology Conference',
+          inst:  'During M.Sc. · 2024',
+          grade: 'Oral Presentation',
+          body:  'Presented research on recent trends in microbiology at an international conference — communicating complex science to a global academic audience while still in M.Sc.',
+          tags:  ['Science Communication', 'Oral Presentation', 'International', 'Microbiology'],
+          highlight: 'International Presenter'
+        }
+      },
+      {
+        id: 'csir',
+        label: 'CSIR NET JRF',
+        sublabel: 'AIR 153',
+        year: 'Jun 2025',
+        h: 4,
+        color: '#ff3366',
+        info: {
+          title: 'CSIR NET JRF — AIR 153',
+          inst:  'Joint CSIR-UGC NET · June 2025',
+          grade: 'JRF + Assistant Professorship Qualified',
+          body:  'Ranked 153rd across all of India in life sciences — the highest national benchmark for research aptitude. Qualifies for Junior Research Fellowship funding and Assistant Professorship eligibility.',
+          tags:  ['AIR 153', 'JRF Qualified', 'Asst. Prof. Eligible', 'Life Sciences', 'National Rank'],
+          highlight: 'AIR 153 · JRF Qualified'
+        }
+      },
+    ];
+
+    // Each milestone colour
+    const COLOURS = MILESTONES.map(m => m.color);
+
+    let canvas, ctx, pts = [], BASE = 0;
+    let animId = null, startTs = null;
+    let drawn = false, cursorOn = true, cursorTs = 0;
+    let hoverIdx = -1;
+    const DURATION = 2200;
+
+    function init() {
+      canvas = document.getElementById('eduEcgCanvas');
+      if (!canvas) return;
+      ctx = canvas.getContext('2d');
+
+      const wrap = document.getElementById('eduCanvasWrap');
+      const tooltip = document.getElementById('eduTooltip');
+
+      // Hover
+      wrap.addEventListener('mousemove', e => {
+        if (!drawn) return;
+        const idx = hit(e.clientX);
+        hoverIdx = idx;
+        if (idx >= 0) {
+          const m = MILESTONES[idx];
+          tooltip.textContent = m.info.title;
+          tooltip.style.left = m._cx + 'px';
+          tooltip.style.top  = (m._base - m._sh - 14) + 'px';
+          tooltip.style.borderColor = m.color;
+          tooltip.style.color = m.color;
+          tooltip.classList.add('visible');
+          wrap.style.cursor = 'pointer';
+        } else {
+          tooltip.classList.remove('visible');
+          wrap.style.cursor = 'crosshair';
+        }
+      });
+      wrap.addEventListener('mouseleave', () => {
+        hoverIdx = -1;
+        tooltip.classList.remove('visible');
+      });
+
+      // Click → info box
+      wrap.addEventListener('click', e => {
+        if (!drawn) return;
+        const idx = hit(e.clientX);
+        if (idx < 0) return;
+        showInfo(idx);
+      });
+
+      resize();
+      startTs = null;
+      animId = requestAnimationFrame(frame);
+
+      // Robust HD sizing: re-fit on any size change + once the open transition settles
+      if (window.ResizeObserver) {
+        const ro = new ResizeObserver(() => {
+          if (!canvas || !document.body.contains(canvas)) { ro.disconnect(); return; }
+          resize();
+          if (drawn) drawFrame(1);
+        });
+        ro.observe(canvas);
+      }
+      setTimeout(() => {
+        if (canvas && document.body.contains(canvas)) { resize(); if (drawn) drawFrame(1); }
+      }, 480);
+    }
+
+    function hit(clientX) {
+      if (!canvas) return -1;
+      const r = canvas.getBoundingClientRect();
+      const x = clientX - r.left;
+      for (let i = 0; i < MILESTONES.length; i++) {
+        if (MILESTONES[i]._cx && Math.abs(MILESTONES[i]._cx - x) < 32) return i;
+      }
+      return -1;
+    }
+
+    function resize() {
+      if (!canvas) return;
+      // clientWidth/Height = layout size, unaffected by the panel's scale transition
+      // (getBoundingClientRect returned the shrunken, mid-animation size → blurry + merged).
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const w = canvas.clientWidth || Math.round(canvas.getBoundingClientRect().width);
+      const h = canvas.clientHeight || 185;
+      if (!w) return;
+      canvas.width  = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      buildPts(w, h);
+    }
+
+    function buildPts(W, H) {
+      const PAD  = Math.max(28, W * 0.05);
+      BASE       = H * 0.75;
+      const MAXH = H * 0.55;
+      const USE  = W - PAD * 2;
+      const N    = MILESTONES.length;
+      const SW   = USE / (N + 1);
+      pts = [{ x: PAD, y: BASE }];
+      MILESTONES.forEach((m, i) => {
+        const cx = PAD + SW * (i + 1);
+        const sh = (m.h / 4) * MAXH;
+        pts.push({ x: cx - SW * 0.28, y: BASE });
+        pts.push({ x: cx - SW * 0.10, y: BASE + Math.min(sh * 0.18, 9) });
+        pts.push({ x: cx,             y: BASE - sh });
+        pts.push({ x: cx + SW * 0.10, y: BASE + Math.min(sh * 0.12, 6) });
+        pts.push({ x: cx + SW * 0.22, y: BASE });
+        m._cx = cx; m._sh = sh; m._base = BASE;
+      });
+      pts.push({ x: W - PAD, y: BASE });
+    }
+
+    function lerp(a, b, t) { return a + (b - a) * t; }
+    function ptAt(t) {
+      const tot = pts.length - 1;
+      const i   = Math.min(Math.floor(t * tot), tot - 1);
+      const f   = t * tot - i;
+      return { x: lerp(pts[i].x, pts[i+1].x, f), y: lerp(pts[i].y, pts[i+1].y, f) };
+    }
+
+    // Get colour for a segment (interpolate between milestone colours)
+    function segColor(segIdx) {
+      // Map segment index to milestone index
+      // 5 pts per milestone + 1 start + 1 end
+      const mi = Math.min(Math.floor((segIdx - 1) / 5), MILESTONES.length - 1);
+      return mi >= 0 ? MILESTONES[mi].color : MILESTONES[0].color;
+    }
+
+    function drawFrame(t) {
+      const dpr = window.devicePixelRatio || 1;
+      const W = canvas.width / dpr, H = canvas.height / dpr;
+      ctx.clearRect(0, 0, W, H);
+
+      // Grid
+      ctx.save();
+      ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([3, 7]);
+      ctx.beginPath(); ctx.moveTo(0, BASE); ctx.lineTo(W, BASE); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.restore();
+
+      const end  = ptAt(t);
+      const tot  = pts.length - 1;
+      const di   = Math.floor(t * tot);
+
+      // Draw colourful trace — segment by segment
+      for (let i = 0; i < di && i < tot; i++) {
+        const col = segColor(i);
+        ctx.save();
+        ctx.strokeStyle = col;
+        ctx.lineWidth   = 2.5;
+        ctx.lineJoin    = 'round';
+        ctx.lineCap     = 'round';
+        ctx.shadowColor = col;
+        ctx.shadowBlur  = 10;
+        ctx.beginPath();
+        ctx.moveTo(pts[i].x, pts[i].y);
+        ctx.lineTo(pts[i+1].x, pts[i+1].y);
+        ctx.stroke();
+        ctx.restore();
+      }
+      // Partial last segment
+      if (di < tot) {
+        const col = segColor(di);
+        ctx.save();
+        ctx.strokeStyle = col;
+        ctx.lineWidth   = 2.5;
+        ctx.lineJoin    = 'round';
+        ctx.lineCap     = 'round';
+        ctx.shadowColor = col;
+        ctx.shadowBlur  = 10;
+        ctx.beginPath();
+        ctx.moveTo(pts[di].x, pts[di].y);
+        ctx.lineTo(end.x, end.y);
+        ctx.stroke();
+        ctx.restore();
+
+        // Moving glow dot
+        ctx.save();
+        ctx.fillStyle  = col; ctx.shadowColor = col; ctx.shadowBlur = 20;
+        ctx.beginPath(); ctx.arc(end.x, end.y, 5, 0, Math.PI*2); ctx.fill();
+        ctx.restore();
+      }
+
+      // Milestone labels + dots
+      const revX = end.x;
+      MILESTONES.forEach((m, mi) => {
+        if (!m._cx || m._cx > revX + 2) return;
+        const isHov = mi === hoverIdx;
+        const col   = m.color;
+        const isTop = m.h === 4;
+        const fsz   = isTop ? Math.min(11, Math.max(9, W * 0.014))
+                            : Math.min(9.5, Math.max(7.5, W * 0.012));
+
+        // Peak dot
+        ctx.save();
+        ctx.fillStyle   = col; ctx.shadowColor = col;
+        ctx.shadowBlur  = isHov ? 22 : 14;
+        ctx.globalAlpha = isHov ? 1 : 0.9;
+        ctx.beginPath(); ctx.arc(m._cx, m._base - m._sh, isHov ? 6.5 : 5, 0, Math.PI*2); ctx.fill();
+        ctx.restore();
+
+        // Label
+        ctx.save();
+        ctx.textAlign   = 'center';
+        ctx.font        = `${isHov ? 700 : 600} ${fsz}px "JetBrains Mono",monospace`;
+        ctx.fillStyle   = col;
+        ctx.shadowColor = col;
+        ctx.shadowBlur  = isHov ? 18 : 11; /* uniform glow for every milestone */
+        const topY = m._base - m._sh - (isHov ? 26 : 24);
+        ctx.fillText(m.label, m._cx, topY);
+        ctx.restore();
+
+        // Sublabel
+        ctx.save();
+        ctx.textAlign   = 'center';
+        ctx.font        = `500 ${Math.min(8, Math.max(6.5, W*0.009))}px "JetBrains Mono",monospace`;
+        ctx.fillStyle   = col;
+        ctx.globalAlpha = 0.65;
+        ctx.fillText(m.sublabel, m._cx, m._base - m._sh - (isHov ? 14 : 12));
+        ctx.restore();
+
+        // Year below baseline
+        ctx.save();
+        ctx.textAlign   = 'center';
+        ctx.font        = `500 ${Math.min(8, Math.max(6.5, W*0.009))}px "JetBrains Mono",monospace`;
+        ctx.fillStyle   = col;
+        ctx.globalAlpha = isHov ? 0.9 : 0.5;
+        ctx.fillText(m.year, m._cx, m._base + 19);
+        ctx.restore();
+
+        // Tick
+        ctx.save();
+        ctx.strokeStyle = col; ctx.lineWidth = isHov ? 1.5 : 1; ctx.globalAlpha = 0.5;
+        ctx.beginPath(); ctx.moveTo(m._cx, m._base+2); ctx.lineTo(m._cx, m._base+9); ctx.stroke();
+        ctx.restore();
+      });
+
+      // Blinking cursor at end
+      if (t >= 1) {
+        const now = performance.now();
+        if (now - cursorTs > 520) { cursorOn = !cursorOn; cursorTs = now; }
+        if (cursorOn) {
+          const lastCol = MILESTONES[MILESTONES.length-1].color;
+          ctx.save();
+          ctx.fillStyle = lastCol; ctx.shadowColor = lastCol; ctx.shadowBlur = 20;
+          ctx.beginPath(); ctx.arc(pts[pts.length-1].x + 8, BASE, 4, 0, Math.PI*2); ctx.fill();
+          ctx.restore();
+        }
+      }
+    }
+
+    function frame(ts) {
+      if (!startTs) startTs = ts;
+      const t = Math.min((ts - startTs) / DURATION, 1);
+      drawFrame(t);
+      if (t < 1) { animId = requestAnimationFrame(frame); return; }
+      drawn = true;
+      animId = requestAnimationFrame(cursorLoop);
+    }
+    let ecgCursorLast = 0;
+    function cursorLoop(ts) {
+      if (!canvas || !document.body.contains(canvas)) { animId = null; return; }
+      animId = requestAnimationFrame(cursorLoop);
+      if (ts && ts - ecgCursorLast < 80) return; // ~12fps — enough for a blinking cursor
+      ecgCursorLast = ts || 0;
+      drawFrame(1);
+    }
+
+    function showInfo(idx) {
+      const m = MILESTONES[idx];
+      const d = m.info;
+      const box = document.getElementById('eduInfoBox');
+      if (!box) return;
+      box.innerHTML = '';
+      box.style.borderColor = m.color;
+
+      const h = el => (tag, cls, txt) => {
+        const e = document.createElement(tag);
+        if (cls) e.className = cls;
+        if (txt !== undefined) e.textContent = txt;
+        return e;
+      };
+
+      const title = document.createElement('div');
+      title.className = 'edu-info-title';
+      title.style.color = m.color;
+      title.textContent = d.title;
+
+      const meta = document.createElement('div');
+      meta.className = 'edu-info-meta';
+      meta.textContent = d.inst + '  ·  ' + d.grade;
+
+      const body = document.createElement('div');
+      body.className = 'edu-info-body';
+      body.textContent = d.body;
+
+      const hi = document.createElement('div');
+      hi.className = 'edu-info-highlight';
+      hi.style.borderColor = m.color;
+      hi.style.color       = m.color;
+      hi.textContent = '⭐ ' + d.highlight;
+
+      const tags = document.createElement('div');
+      tags.className = 'edu-info-tags';
+      d.tags.forEach(t => {
+        const s = document.createElement('span');
+        s.className = 'edu-tag';
+        s.style.borderColor = m.color + '66';
+        s.style.color       = m.color;
+        s.textContent = t;
+        tags.appendChild(s);
+      });
+
+      box.append(title, meta, hi, body, tags);
+      box.classList.add('visible');
+    }
+
+    // Trigger init when education detail panel opens
+    const detailScreen = document.getElementById('detail-screen');
+    if (detailScreen) {
+      const observer = new MutationObserver(() => {
+        if (!detailScreen.classList.contains('open')) return;
+        const c = document.getElementById('eduEcgCanvas');
+        if (!c || c === canvas) return;
+        // New canvas just appeared — education panel just opened
+        drawn = false; pts = []; startTs = null;
+        if (animId) cancelAnimationFrame(animId);
+        // Small delay so the panel finishes its CSS transition first
+        setTimeout(init, 120);
+      });
+      observer.observe(detailScreen, { attributes: true, attributeFilter: ['class'] });
+    }
+
+    window.addEventListener('resize', () => {
+      if (!canvas || !drawn) return;
+      if (animId) cancelAnimationFrame(animId);
+      resize();
+      drawFrame(1);
+      animId = requestAnimationFrame(cursorLoop);
+    });
+  })();
+  </script>
+
+</body>
+</html>

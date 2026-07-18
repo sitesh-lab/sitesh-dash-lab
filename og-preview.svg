@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Syne:wght@700;800&display=swap');
+      
+      .bg { fill: #05060c; }
+      .neon { fill: none; stroke: #39ff14; stroke-width: 2; }
+      .neon-text { fill: #39ff14; font-family: 'Syne', sans-serif; font-weight: 800; text-shadow: 0 0 16px #39ff14; }
+      .sub-text { fill: #eef2ff; font-family: 'JetBrains Mono', monospace; font-size: 24px; }
+      .accent-text { fill: #00e5ff; font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 600; }
+      .glow-circle { fill: none; stroke: #39ff14; stroke-width: 3; filter: drop-shadow(0 0 20px #39ff14); opacity: 0.6; }
+    </style>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect class="bg" width="1200" height="630"/>
+  
+  <!-- Gradient overlay -->
+  <defs>
+    <radialGradient id="grad" cx="40%" cy="30%">
+      <stop offset="0%" style="stop-color:#39ff14;stop-opacity:0.1" />
+      <stop offset="100%" style="stop-color:#05060c;stop-opacity:0" />
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#grad)"/>
+  
+  <!-- Left: Benzene ring -->
+  <g transform="translate(150, 220)">
+    <polygon class="neon" points="0,-60 52,-30 52,30 0,60 -52,30 -52,-30" />
+    <circle class="glow-circle" cx="0" cy="0" r="35"/>
+  </g>
+  
+  <!-- Center: Circular headshot area with neon glow -->
+  <g transform="translate(600, 220)">
+    <circle cx="0" cy="0" r="95" fill="rgba(57, 255, 20, 0.1)" stroke="#39ff14" stroke-width="3" filter="url(#glow)"/>
+    <circle cx="0" cy="0" r="85" fill="rgba(8, 12, 24, 0.7)"/>
+    <!-- Placeholder circle for headshot -->
+    <circle cx="0" cy="0" r="82" fill="#1a1a2e" opacity="0.5" stroke="#39ff14" stroke-width="2" stroke-dasharray="5,5"/>
+    <text x="0" y="0" text-anchor="middle" dominant-baseline="middle" fill="#39ff14" font-size="28" font-weight="bold" opacity="0.7">📸</text>
+  </g>
+  
+  <!-- Right: DNA helix -->
+  <g transform="translate(1050, 220)">
+    <path class="neon" d="M 0,-50 C 30,-30 30,30 0,50 M 0,-50 C -30,-30 -30,30 0,50" />
+    <circle class="glow-circle" cx="0" cy="0" r="40"/>
+  </g>
+  
+  <!-- Main Content -->
+  <text x="600" y="100" class="neon-text" font-size="64" text-anchor="middle" font-weight="800">SITESH KUMAR DASH</text>
+  
+  <text x="600" y="175" class="accent-text" font-size="26" text-anchor="middle" text-transform="uppercase" letter-spacing="3">Biochemist · Molecular Biologist · Science Communicator</text>
+  
+  <!-- Credentials -->
+  <text x="600" y="260" class="sub-text" font-size="22" text-anchor="middle" font-weight="600">
+    <tspan x="600">CSIR NET JRF • AIR 153</tspan>
+  </text>
+  
+  <!-- Research Focus -->
+  <text x="600" y="335" class="sub-text" font-size="20" text-anchor="middle" opacity="0.85">
+    <tspan x="600">Remac-PET • Bioremediation • Genomics</tspan>
+  </text>
+  
+  <text x="600" y="380" class="sub-text" font-size="18" text-anchor="middle" opacity="0.7">
+    <tspan x="600">Science Programming Associate • Param Foundation</tspan>
+  </text>
+  
+  <!-- Footer brand -->
+  <text x="600" y="530" class="neon-text" font-size="20" text-anchor="middle">AI BIODESIGNER</text>
+  
+  <!-- Bottom accent line -->
+  <line x1="300" y1="560" x2="900" y2="560" stroke="#39ff14" stroke-width="2" opacity="0.5"/>
+</svg>

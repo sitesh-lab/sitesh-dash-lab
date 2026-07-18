@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sitesh Kumar Dash — CV</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+
+    /* ══ TOKENS ══ */
+    :root {
+      --bg:    #06090F;
+      --surf:  #0C1828;
+      --card:  #0F1D32;
+      --teal:  #00DEAE;
+      --t10:   rgba(0,222,174,0.10);
+      --t22:   rgba(0,222,174,0.22);
+      --amber: #F5A52A;
+      --blue:  #4B9FE1;
+      --white: #E6EEF8;
+      --muted: #7A95B8;
+      --bdr:   rgba(0,222,174,0.11);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg); color: var(--white);
+      font-size: 13.5px; line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { text-decoration: none; color: inherit; }
+
+    /* ══ HERO ══ */
+    .hero {
+      position: relative;
+      background: var(--surf);
+      border-bottom: 1px solid var(--bdr);
+      padding: 38px 56px 0;
+      overflow: hidden;
+    }
+    #mol-canvas {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      opacity: 0.33; pointer-events: none;
+    }
+    .hero-top {
+      position: relative; z-index: 1;
+      display: flex; flex-direction: column; gap: 0;
+    }
+    .eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; letter-spacing: 0.22em;
+      color: var(--teal); text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .hero-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 48px; font-weight: 700;
+      letter-spacing: -1.8px; line-height: 1.0;
+      color: var(--white); margin-bottom: 9px;
+    }
+    .hero-cred {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13.5px; font-weight: 500;
+      color: var(--muted); margin-bottom: 7px;
+      display: flex; align-items: center; flex-wrap: wrap; gap: 7px;
+    }
+    .air-chip {
+      display: inline-flex; align-items: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9.5px; letter-spacing: 0.1em;
+      color: var(--teal); background: var(--t10);
+      border: 1px solid var(--t22);
+      border-radius: 4px; padding: 2px 7px;
+    }
+    .hero-tagline {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12.5px; font-style: italic;
+      color: rgba(230,238,248,0.42);
+      margin-bottom: 18px;
+    }
+    .contact-row {
+      display: flex; flex-wrap: wrap;
+      gap: 18px; row-gap: 6px; margin-bottom: 0;
+    }
+    .c-item {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px; color: var(--muted);
+    }
+    .c-item a { color: var(--teal); }
+
+    /* ── BIO STATS STRIP ── */
+    .bio-strip {
+      position: relative; z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      border-top: 1px solid var(--bdr);
+      margin-top: 28px;
+    }
+    .bio-stat {
+      padding: 18px 20px;
+      border-right: 1px solid var(--bdr);
+      display: flex; flex-direction: column; gap: 4px;
+    }
+    .bio-stat:last-child { border-right: none; }
+    .bio-num {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 28px; font-weight: 700;
+      letter-spacing: -1px; line-height: 1;
+      color: var(--teal);
+    }
+    .bio-num-small {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 20px; font-weight: 700;
+      letter-spacing: -0.5px; line-height: 1;
+      color: var(--teal);
+    }
+    .bio-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px; letter-spacing: 0.14em;
+      color: var(--muted); text-transform: uppercase;
+      line-height: 1.5;
+    }
+
+    /* ══ LAYOUT ══ */
+    .cv-layout { display: grid; grid-template-columns: 270px 1fr; }
+
+    /* ══ SIDEBAR ══ */
+    .sidebar {
+      background: var(--surf);
+      border-right: 1px solid var(--bdr);
+      padding: 30px 22px;
+    }
+    .s-block { margin-bottom: 26px; }
+    .s-label {
+      display: block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px; letter-spacing: 0.24em;
+      color: var(--teal); text-transform: uppercase;
+      border-bottom: 1px solid var(--bdr);
+      padding-bottom: 8px; margin-bottom: 12px;
+    }
+    .s-bio { font-size: 12px; line-height: 1.78; color: rgba(230,238,248,0.67); }
+
+    .sg { margin-bottom: 11px; }
+    .sg-name {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 8.5px; color: var(--amber);
+      text-transform: uppercase; letter-spacing: 0.15em;
+      margin-bottom: 6px;
+    }
+    .tags { display: flex; flex-wrap: wrap; gap: 4px; }
+    .tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px; padding: 2px 6px;
+      border-radius: 3px; border: 1px solid var(--bdr);
+      color: var(--muted); background: rgba(255,255,255,0.02);
+    }
+    .tag-t { border-color: rgba(0,222,174,0.26);  color: var(--teal);  background: rgba(0,222,174,0.05); }
+    .tag-b { border-color: rgba(75,159,225,0.26);  color: var(--blue);  background: rgba(75,159,225,0.05); }
+    .tag-a { border-color: rgba(245,165,42,0.26);  color: var(--amber); background: rgba(245,165,42,0.05); }
+    .tag-p { border-color: rgba(160,100,240,0.26); color: #c084fc;      background: rgba(160,100,240,0.05); }
+
+    .tags-print { display: none; }
+
+    .lang-item { margin-bottom: 10px; }
+    .lang-row  { display: flex; justify-content: space-between; margin-bottom: 4px; }
+    .lang-name { font-size: 12.5px; font-weight: 500; }
+    .lang-lvl  {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 8.5px; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.1em;
+    }
+    .lang-bar  { height: 2px; background: rgba(255,255,255,0.07); border-radius: 2px; }
+    .lang-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--teal), var(--blue)); }
+    .lang-print { display: none; }
+
+    /* ══ MAIN ══ */
+    .main-content { background: var(--bg); padding: 34px 44px; }
+    .section      { margin-bottom: 30px; }
+    .sec-hdr      { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+    .sec-dot      {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--teal); box-shadow: 0 0 8px var(--teal); flex-shrink: 0;
+    }
+    .sec-title    { font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 600; }
+    .sec-rule     { flex: 1; height: 1px; background: var(--bdr); }
+
+    .entry {
+      background: var(--card); border: 1px solid var(--bdr);
+      border-radius: 8px; padding: 15px 18px;
+      margin-bottom: 10px; transition: border-color 0.18s;
+    }
+    .entry:hover { border-color: rgba(0,222,174,0.28); }
+
+    .entry-hd {
+      display: flex; justify-content: space-between;
+      align-items: flex-start; gap: 12px; margin-bottom: 8px;
+    }
+    .entry-org   { font-size: 11.5px; color: var(--teal); font-weight: 500; margin-bottom: 2px; }
+    .entry-title { font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; font-weight: 600; }
+    .entry-prev  { font-size: 10px; color: var(--muted); font-style: italic; margin-top: 2px; }
+    .entry-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
+    .entry-date  {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9.5px; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.1em; white-space: nowrap;
+    }
+    .entry-grade {
+      font-family: 'JetBrains Mono', monospace; font-size: 9.5px;
+      color: var(--amber); background: rgba(245,165,42,0.08);
+      border: 1px solid rgba(245,165,42,0.22); padding: 2px 7px; border-radius: 4px;
+    }
+
+    .bullets { list-style: none; }
+    .bullets li {
+      font-size: 12px; color: rgba(230,238,248,0.70);
+      padding: 3px 0 3px 15px; position: relative; line-height: 1.65;
+    }
+    .bullets li::before {
+      content: ''; position: absolute; left: 0; top: 10px;
+      width: 7px; height: 1px; background: var(--teal);
+    }
+
+    .cert-entry { background: var(--card); border: 1px solid var(--bdr); border-radius: 8px; padding: 14px 18px; }
+    .cert-hd    { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 5px; }
+    .cert-name  { font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; font-weight: 600; }
+    .cert-body  { font-size: 12px; color: rgba(230,238,248,0.65); line-height: 1.65; }
+
+    .toolkit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+    .t-card  { background: var(--card); border: 1px solid var(--bdr); border-radius: 7px; padding: 13px 14px; }
+    .t-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px; color: var(--amber);
+      text-transform: uppercase; letter-spacing: 0.14em; margin-bottom: 8px;
+    }
+
+
+    /* ══════════════════════════════════════════
+       MOBILE  ≤ 680px
+    ══════════════════════════════════════════ */
+    @media (max-width: 680px) {
+      .hero { padding: 26px 18px 0; }
+
+      .hero-name    { font-size: 34px; letter-spacing: -1px; margin-bottom: 8px; }
+      .eyebrow      { font-size: 9px; margin-bottom: 8px; }
+      .hero-cred    { font-size: 12px; margin-bottom: 6px; gap: 5px; }
+      .hero-tagline { font-size: 11.5px; margin-bottom: 14px; }
+      .contact-row  { gap: 12px; row-gap: 8px; }
+      .c-item       { font-size: 10px; }
+
+      .bio-strip { grid-template-columns: repeat(2, 1fr); margin-top: 20px; }
+      .bio-stat  { padding: 14px 16px; }
+      .bio-stat:nth-child(2) { border-right: none; }
+      .bio-num   { font-size: 24px; }
+      .bio-num-small { font-size: 17px; }
+
+      .cv-layout    { grid-template-columns: 1fr; }
+      .sidebar      { border-right: none; border-bottom: 1px solid var(--bdr); padding: 22px 18px; }
+      .main-content { padding: 22px 18px; }
+      .section      { margin-bottom: 22px; }
+
+      .toolkit-grid { grid-template-columns: 1fr; }
+
+      .entry-hd     { flex-direction: column; gap: 6px; }
+      .entry-right  { flex-direction: row; align-items: center; gap: 8px; align-self: flex-start; }
+    }
+
+    @media (max-width: 420px) {
+      .hero-name { font-size: 28px; }
+      .contact-row { flex-direction: column; gap: 6px; }
+      .bio-strip { grid-template-columns: 1fr 1fr; }
+    }
+
+
+    /* ══════════════════════════════════════════
+       PRINT — 1-PAGE A4
+    ══════════════════════════════════════════ */
+    @media print {
+
+      @page { size: A4 portrait; margin: 9mm 11mm; }
+
+      *, *::before, *::after {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
+      :root {
+        --bg:    #ffffff;
+        --surf:  #f2f6fa;
+        --card:  #f7fafe;
+        --teal:  #006B5E;
+        --t10:   rgba(0,107,94,0.07);
+        --t22:   rgba(0,107,94,0.28);
+        --amber: #8a5200;
+        --blue:  #1a58a0;
+        --white: #0b1827;
+        --muted: #4a607a;
+        --bdr:   #c4d4e4;
+      }
+
+      html, body { background: white !important; color: #0b1827 !important; font-size: 9.5px !important; line-height: 1.48 !important; }
+
+      #mol-canvas { display: none !important; }
+      .no-print   { display: none !important; }
+
+      /* hero */
+      .hero         { background: #f2f6fa !important; border-bottom: 1.5px solid #006B5E !important; padding: 11px 18px 0 !important; }
+      .eyebrow      { font-size: 7px !important; color: #006B5E !important; margin-bottom: 4px !important; }
+      .hero-name    { font-size: 22px !important; letter-spacing: -0.5px !important; color: #0b1827 !important; margin-bottom: 4px !important; }
+      .hero-cred    { font-size: 8.5px !important; color: #334d66 !important; margin-bottom: 4px !important; gap: 4px !important; }
+      .air-chip     { font-size: 7px !important; padding: 1px 4px !important; color: #006B5E !important; background: rgba(0,107,94,0.07) !important; border-color: rgba(0,107,94,0.28) !important; }
+      .hero-tagline { font-size: 7.5px !important; color: #4a607a !important; margin-bottom: 6px !important; }
+      .contact-row  { gap: 10px !important; row-gap: 2px !important; }
+      .c-item       { font-size: 7.5px !important; color: #4a607a !important; }
+      .c-item a     { color: #006B5E !important; }
+
+      /* bio strip */
+      .bio-strip {
+        border-top: 1px solid #c4d4e4 !important;
+        margin-top: 8px !important;
+        grid-template-columns: repeat(4,1fr) !important;
+      }
+      .bio-stat     { padding: 7px 10px !important; border-right-color: #c4d4e4 !important; }
+      .bio-num      { font-size: 16px !important; color: #006B5E !important; }
+      .bio-num-small { font-size: 12px !important; color: #006B5E !important; }
+      .bio-label    { font-size: 6.5px !important; color: #4a607a !important; }
+
+      /* layout */
+      .cv-layout { grid-template-columns: 158px 1fr !important; }
+
+      /* sidebar */
+      .sidebar   { background: #f2f6fa !important; border-right: 1px solid #c4d4e4 !important; padding: 9px !important; }
+      .s-block   { margin-bottom: 9px !important; }
+      .s-label   { font-size: 7px !important; color: #006B5E !important; border-bottom-color: #c4d4e4 !important; padding-bottom: 4px !important; margin-bottom: 6px !important; }
+      .s-bio     { font-size: 7.8px !important; line-height: 1.52 !important; color: #233a54 !important; }
+      .sg        { margin-bottom: 6px !important; }
+      .sg-name   { font-size: 7px !important; color: #8a5200 !important; margin-bottom: 3px !important; }
+      .tags      { display: none !important; }
+      .tags-print { display: block !important; font-size: 7.5px !important; color: #233a54 !important; line-height: 1.62 !important; }
+      .lang-item { display: none !important; }
+      .lang-print { display: block !important; font-size: 7.5px !important; color: #233a54 !important; line-height: 1.8 !important; }
+
+      /* main */
+      .main-content { background: white !important; padding: 9px 13px !important; }
+      .section      { margin-bottom: 7px !important; }
+      .sec-hdr      { margin-bottom: 5px !important; gap: 7px !important; }
+      .sec-dot      { width: 6px !important; height: 6px !important; background: #006B5E !important; box-shadow: none !important; }
+      .sec-title    { font-size: 10px !important; color: #0b1827 !important; }
+      .sec-rule     { background: #c4d4e4 !important; }
+
+      .entry        { background: #f7fafe !important; border-color: #c4d4e4 !important; border-radius: 4px !important; padding: 6px 9px !important; margin-bottom: 5px !important; page-break-inside: avoid !important; }
+      .entry-hd     { margin-bottom: 4px !important; flex-direction: row !important; }
+      .entry-org    { font-size: 7.8px !important; color: #006B5E !important; margin-bottom: 1px !important; }
+      .entry-title  { font-size: 9.5px !important; color: #0b1827 !important; }
+      .entry-prev   { font-size: 7.5px !important; color: #4a607a !important; margin-top: 1px !important; }
+      .entry-date   { font-size: 7.5px !important; color: #4a607a !important; white-space: nowrap !important; }
+      .entry-grade  { font-size: 7.5px !important; color: #8a5200 !important; background: rgba(138,82,0,0.06) !important; border-color: rgba(138,82,0,0.22) !important; padding: 1px 5px !important; }
+      .entry-right  { flex-direction: column !important; align-items: flex-end !important; }
+
+      .bullets li   { font-size: 7.8px !important; color: #1e3450 !important; padding: 1.5px 0 1.5px 11px !important; line-height: 1.46 !important; }
+      .bullets li::before { width: 6px !important; top: 7px !important; background: #006B5E !important; }
+
+      .cert-entry   { background: #f7fafe !important; border-color: #c4d4e4 !important; border-radius: 4px !important; padding: 6px 9px !important; page-break-inside: avoid !important; }
+      .cert-hd      { margin-bottom: 4px !important; }
+      .cert-name    { font-size: 9.5px !important; color: #0b1827 !important; }
+      .cert-body    { font-size: 7.8px !important; color: #233a54 !important; line-height: 1.46 !important; }
+
+      .section      { page-break-inside: avoid !important; }
+      .sec-hdr      { page-break-after: avoid !important; }
+    }
+
+  </style>
+</head>
+<body>
+
+<!-- ══ HERO ══ -->
+<header class="hero">
+  <canvas id="mol-canvas"></canvas>
+  <div class="hero-top">
+    <div class="eyebrow">Biochemist &nbsp;·&nbsp; Molecular Biologist &nbsp;·&nbsp; Science Communicator</div>
+    <h1 class="hero-name">Sitesh Kumar Dash</h1>
+    <div class="hero-cred">
+      CSIR NET JRF &nbsp;<span class="air-chip">AIR 153</span>
+      &nbsp;·&nbsp; M.Sc. Biochemistry &amp; Molecular Biology
+      &nbsp;·&nbsp; Param Foundation, Bengaluru
+    </div>
+    <p class="hero-tagline">Bridging the lab bench and the gallery floor — from molecular structures to live visitor cognition.</p>
+    <div class="contact-row">
+      <span class="c-item">✉&nbsp;<a href="mailto:dsitesh2003@gmail.com">dsitesh2003@gmail.com</a></span>
+      <span class="c-item">✉&nbsp;<a href="mailto:sitesh@paraminnovation.org">sitesh@paraminnovation.org</a>&nbsp;(work)</span>
+      <span class="c-item">☎&nbsp;+91 9566513307</span>
+      <span class="c-item">🔗&nbsp;<a href="https://linkedin.com/in/d-sitesh">linkedin.com/in/d-sitesh</a></span>
+      <span class="c-item">🌐&nbsp;<a href="https://siteshkumardash.vercel.app">siteshkumardash.vercel.app</a></span>
+      <span class="c-item">📍&nbsp;Bengaluru, KA · Cuttack, OD</span>
+    </div>
+  </div>
+
+  <!-- BIO STATS STRIP -->
+  <div class="bio-strip">
+    <div class="bio-stat">
+      <span class="bio-num">153</span>
+      <span class="bio-label">AIR · CSIR NET JRF<br>June 2025 · Life Sciences</span>
+    </div>
+    <div class="bio-stat">
+      <span class="bio-num">1,568</span>
+      <span class="bio-label">Visitors · Curves of Thought<br>Behavioral study, 2026</span>
+    </div>
+    <div class="bio-stat">
+      <span class="bio-num-small">Remac-PET</span>
+      <span class="bio-label">Active PhD proposal<br>Enzymatic PET bioremediation</span>
+    </div>
+    <div class="bio-stat">
+      <span class="bio-num-small">Mar → Jul '26</span>
+      <span class="bio-label">SC to Programming Associate<br>4-month probation to promotion</span>
+    </div>
+  </div>
+</header>
+
+<!-- ══ BODY ══ -->
+<div class="cv-layout">
+
+  <!-- ══ SIDEBAR ══ -->
+  <aside class="sidebar">
+
+    <div class="s-block">
+      <span class="s-label">Profile</span>
+      <p class="s-bio">CSIR NET JRF qualified Biochemist at the intersection of molecular science and public engagement. Currently leads programming quality, pedagogy, and people at Param Foundation — treating the science floor as a behavioral lab and the visitor as a cognitive subject.</p>
+    </div>
+
+    <div class="s-block">
+      <span class="s-label">Competencies</span>
+
+      <div class="sg">
+        <div class="sg-name">Programme &amp; People</div>
+        <div class="tags">
+          <span class="tag tag-p">Quality Control</span>
+          <span class="tag tag-p">Pedagogy Design</span>
+          <span class="tag tag-p">People Management</span>
+          <span class="tag tag-p">SC Coaching</span>
+          <span class="tag tag-p">Training Facilitation</span>
+          <span class="tag tag-p">Programme Scheduling</span>
+        </div>
+        <div class="tags-print">Quality Control · Pedagogy Design · People Management · SC Coaching · Training Facilitation · Programme Scheduling</div>
+      </div>
+
+      <div class="sg">
+        <div class="sg-name">Life Sciences</div>
+        <div class="tags">
+          <span class="tag tag-t">Molecular Biology</span>
+          <span class="tag tag-t">Biochemistry</span>
+          <span class="tag tag-t">Enzymology</span>
+          <span class="tag tag-t">Immunology</span>
+          <span class="tag tag-t">Cell Biology</span>
+          <span class="tag tag-t">Biophysics</span>
+          <span class="tag tag-t">Bioremediation</span>
+        </div>
+        <div class="tags-print">Molecular Biology · Biochemistry · Enzymology · Immunology · Cell Biology · Biophysics · Bioremediation</div>
+      </div>
+
+      <div class="sg">
+        <div class="sg-name">Computational &amp; Bioinformatics</div>
+        <div class="tags">
+          <span class="tag tag-b">PyMOL</span>
+          <span class="tag tag-b">Cytoscape</span>
+          <span class="tag tag-b">BLAST</span>
+          <span class="tag tag-b">ClustalW</span>
+          <span class="tag tag-b">MEGA</span>
+          <span class="tag tag-b">GraphPad Prism</span>
+          <span class="tag tag-b">ImageJ</span>
+        </div>
+        <div class="tags-print">PyMOL · Cytoscape · BLAST · ClustalW · MEGA · GraphPad Prism · ImageJ · Primer Design</div>
+      </div>
+
+      <div class="sg">
+        <div class="sg-name">Wet Lab</div>
+        <div class="tags">
+          <span class="tag">ELISA</span>
+          <span class="tag">Western Blotting</span>
+          <span class="tag">DNA Isolation</span>
+          <span class="tag">Expression Vectors</span>
+          <span class="tag">PCR Cloning</span>
+        </div>
+        <div class="tags-print">ELISA · Western Blotting · DNA Isolation · Expression Vectors · PCR Cloning</div>
+      </div>
+
+      <div class="sg">
+        <div class="sg-name">Science Communication</div>
+        <div class="tags">
+          <span class="tag tag-a">Live Facilitation</span>
+          <span class="tag tag-a">Exhibit Design</span>
+          <span class="tag tag-a">Visitor Cognition</span>
+          <span class="tag tag-a">Scientific Pedagogy</span>
+          <span class="tag tag-a">Liquid N₂ Demos</span>
+        </div>
+        <div class="tags-print">Live Facilitation · Exhibit Design · Visitor Cognition · Scientific Pedagogy · Liquid N₂ Demonstrations</div>
+      </div>
+    </div>
+
+    <div class="s-block">
+      <span class="s-label">Languages</span>
+      <div class="lang-item">
+        <div class="lang-row"><span class="lang-name">English</span><span class="lang-lvl">Professional</span></div>
+        <div class="lang-bar"><div class="lang-fill" style="width:95%"></div></div>
+      </div>
+      <div class="lang-item">
+        <div class="lang-row"><span class="lang-name">Hindi</span><span class="lang-lvl">Professional</span></div>
+        <div class="lang-bar"><div class="lang-fill" style="width:90%"></div></div>
+      </div>
+      <div class="lang-item">
+        <div class="lang-row"><span class="lang-name">Odia</span><span class="lang-lvl">Native</span></div>
+        <div class="lang-bar"><div class="lang-fill" style="width:100%"></div></div>
+      </div>
+      <div class="lang-print">
+        English — Professional<br>
+        Hindi — Professional<br>
+        Odia — Native
+      </div>
+    </div>
+
+    <div class="s-block no-print">
+      <span class="s-label">Research Interests</span>
+      <div class="tags">
+        <span class="tag tag-t">Microplastic Bioremediation</span>
+        <span class="tag tag-t">PET Degradation Enzymes</span>
+        <span class="tag">Engineered Macrophages</span>
+        <span class="tag">Visitor Cognition</span>
+        <span class="tag">Informal Science Education</span>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- ══ MAIN ══ -->
+  <main class="main-content">
+
+    <!-- Education -->
+    <div class="section">
+      <div class="sec-hdr">
+        <div class="sec-dot"></div>
+        <div class="sec-title">Education</div>
+        <div class="sec-rule"></div>
+      </div>
+
+      <div class="entry">
+        <div class="entry-hd">
+          <div>
+            <div class="entry-org">Pondicherry University</div>
+            <div class="entry-title">M.Sc. — Biochemistry &amp; Molecular Biology</div>
+          </div>
+          <div class="entry-right">
+            <div class="entry-date">2023 — 2025</div>
+            <div class="entry-grade">CGPA 6.07 · First Class</div>
+          </div>
+        </div>
+        <ul class="bullets">
+          <li>Specialised track in Advanced Bioinformatics and Computational Genomics; designed an in silico pipeline for enzymatic PET microplastic degradation (Remac-PET System, active PhD proposal).</li>
+          <li>Wet-lab execution: expression vector engineering, ELISA characterisation, and Western Blotting with high inter-assay reproducibility.</li>
+          <li>Key modules: Biochemistry, Molecular Biology, Immunology, Molecular Genetics, Cell Biology, Biophysics, Bioinformatics, Genomics.</li>
+        </ul>
+      </div>
+
+      <div class="entry">
+        <div class="entry-hd">
+          <div>
+            <div class="entry-org">S.V.M. College (Autonomous), Jagatsinghpur · Utkal University</div>
+            <div class="entry-title">B.Sc. — Zoology (Hons.), Chemistry &amp; Botany</div>
+          </div>
+          <div class="entry-right">
+            <div class="entry-date">2020 — 2023</div>
+            <div class="entry-grade">8.82 / 10 · First Class Distinction</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Experience -->
+    <div class="section">
+      <div class="sec-hdr">
+        <div class="sec-dot"></div>
+        <div class="sec-title">Professional Experience</div>
+        <div class="sec-rule"></div>
+      </div>
+
+      <!-- Science Programming Associate -->
+      <div class="entry">
+        <div class="entry-hd">
+          <div>
+            <div class="entry-org">Param Foundation · Bengaluru</div>
+            <div class="entry-title">Science Programming Associate</div>
+            <div class="entry-prev">fmr. Programming POC · promoted 26 Jun 2026</div>
+          </div>
+          <div class="entry-right">
+            <div class="entry-date">26 Jun 2026 — Present</div>
+          </div>
+        </div>
+        <ul class="bullets">
+          <li>Quality and pedagogy owner for the centre — conduct gallery rounds, in-session SC observations, visitor feedback reviews, and real-time coaching to hold the daily communication standard.</li>
+          <li>People manager for the full SC team: lead weekly internal learning sessions, run biweekly mock tours (playing the visitor role), and manage onboarding and exit regimes for individual visitors and school groups.</li>
+          <li>Translate monthly HQ pedagogy themes to floor-level implementation; own the weekly gallery programming schedule, question banks, and challenge prompts.</li>
+          <li>Single point of contact for all centre programming — sync weekly with HQ team lead; coordinate with Event, Research, Exhibit, Marketing, and Ticketing functions.</li>
+          <li>Authored the ParSEC Biotech Story Arc Proposal (Draft v1.0, 2026): a five-zone interactive biology gallery ideation document covering cell biology, central dogma, bioenergetics, antimicrobial resistance, and genetic engineering — with detailed hardware specifications (ESP32, Raspberry Pi 4, pogo-pin conductive socket systems, WS2812B LEDs) and visitor experience design. Proposal stage; not yet approved for construction.</li>
+        </ul>
+      </div>
+
+      <!-- Science Communicator -->
+      <div class="entry">
+        <div class="entry-hd">
+          <div>
+            <div class="entry-org">Param Foundation · ParSEC Whitefield, Bengaluru</div>
+            <div class="entry-title">Science Communicator</div>
+          </div>
+          <div class="entry-right">
+            <div class="entry-date">Apr 2026 — 25 Jun 2026</div>
+          </div>
+        </div>
+        <ul class="bullets">
+          <li>Facilitated live science demonstrations and workshops for audiences from school groups to corporate visitors — translating complex physical and biological phenomena into high-retention experiential learning.</li>
+          <li>First-authored the <em>Curves of Thought</em> study (N ≈ 1,568, Apr–Jun 2026) — a naturalistic observational study on schema activation, age-dependent pattern recognition, and visual focal point dependency at the 'Math in Motion' cobot exhibit. Key theoretical contribution: <em>schema version specificity</em>. Three formal research questions, facilitation bias sub-study (4 secondary observers, n ≈ 70–80). Manuscript in preparation; target journals include <em>Journal of Science Education and Technology</em> and <em>Frontiers in Psychology</em>.</li>
+          <li>Designed the Sakura Bloom Demo with an embedded multi-variable visitor experiment (ammonia × bloom speed; paper type × capillarity; temperature × crystal formation rate) and structured prediction card data collection protocol.</li>
+          <li>Live operation of Liquid Nitrogen cryogenics, Bernoulli apparatus, Total Internal Reflection rigs, and Cobot (Maths in Motion) for public audiences.</li>
+        </ul>
+      </div>
+
+      <!-- M.Sc. Researcher -->
+      <div class="entry">
+        <div class="entry-hd">
+          <div>
+            <div class="entry-org">Pondicherry University — Life Sciences Department</div>
+            <div class="entry-title">M.Sc. Graduate Researcher</div>
+          </div>
+          <div class="entry-right">
+            <div class="entry-date">Oct 2023 — May 2025</div>
+          </div>
+        </div>
+        <ul class="bullets">
+          <li>Conceptualised the Remac-PET System: in silico framework for enzymatic PET microplastic degradation using engineered macrophage-like delivery cells — active PhD proposal for collaborative fellowship applications.</li>
+          <li>Advanced 3D molecular visualisation in PyMOL and biological network construction in Cytoscape; synthesised datasets in GraphPad Prism for IC50 fitting and milestone reviews.</li>
+        </ul>
+      </div>
+
+      <!-- Field Research -->
+      <div class="entry">
+        <div class="entry-hd">
+          <div>
+            <div class="entry-org">Community Research Initiative — Cuttack, Odisha</div>
+            <div class="entry-title">Volunteer Field Research Assistant</div>
+          </div>
+          <div class="entry-right">
+            <div class="entry-date">2020 — 2023</div>
+          </div>
+        </div>
+        <ul class="bullets">
+          <li>Executed qualitative field surveys on single-parent households; designed a zonal demographic mapping system across Cuttack to structure community outreach and data collection.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Toolkit — screen only -->
+    <div class="section no-print">
+      <div class="sec-hdr">
+        <div class="sec-dot"></div>
+        <div class="sec-title">Technical Toolkit</div>
+        <div class="sec-rule"></div>
+      </div>
+      <div class="toolkit-grid">
+        <div class="t-card">
+          <div class="t-title">3D Visualization &amp; Networks</div>
+          <div class="tags"><span class="tag tag-t">PyMOL</span><span class="tag tag-t">Cytoscape</span><span class="tag">RasMol</span><span class="tag">Cn3D</span></div>
+        </div>
+        <div class="t-card">
+          <div class="t-title">Bioinformatics &amp; Genomics</div>
+          <div class="tags"><span class="tag tag-b">BLAST</span><span class="tag tag-b">ClustalW</span><span class="tag tag-b">MEGA</span><span class="tag tag-b">Primer Design</span></div>
+        </div>
+        <div class="t-card">
+          <div class="t-title">Data Analysis</div>
+          <div class="tags"><span class="tag tag-a">GraphPad Prism</span><span class="tag">ImageJ</span><span class="tag">Excel (Adv.)</span></div>
+        </div>
+        <div class="t-card">
+          <div class="t-title">Wet Lab</div>
+          <div class="tags"><span class="tag">ELISA</span><span class="tag">Western Blotting</span><span class="tag">DNA Isolation</span><span class="tag">Expression Vectors</span></div>
+        </div>
+        <div class="t-card">
+          <div class="t-title">Live Floor Instrumentation</div>
+          <div class="tags"><span class="tag tag-t">Liquid Nitrogen</span><span class="tag tag-t">Bernoulli Apparatus</span><span class="tag tag-t">Total Internal Reflection</span><span class="tag tag-t">Cobot</span></div>
+        </div>
+        <div class="t-card">
+          <div class="t-title">Communication &amp; Design</div>
+          <div class="tags"><span class="tag">PowerPoint (Adv.)</span><span class="tag">Scientific Poster Design</span><span class="tag">Exhibit Scripting</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Certifications -->
+    <div class="section">
+      <div class="sec-hdr">
+        <div class="sec-dot"></div>
+        <div class="sec-title">Certifications &amp; Awards</div>
+        <div class="sec-rule"></div>
+      </div>
+      <div class="cert-entry">
+        <div class="cert-hd">
+          <div class="cert-name">CSIR-UGC NET — Junior Research Fellowship (JRF)</div>
+          <div class="entry-right">
+            <div class="entry-date">June 2025</div>
+            <div class="entry-grade">AIR 153 · Life Sciences</div>
+          </div>
+        </div>
+        <p class="cert-body">Qualified for both Junior Research Fellowship and Eligibility for Assistant Professorship / Lectureship. Enables fully-funded PhD research at any CSIR institute or central university in India.</p>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+(function () {
+  const c = document.getElementById('mol-canvas');
+  if (!c) return;
+  const x = c.getContext('2d');
+  const N=50, D=120, S=0.28;
+  let ns=[], r;
+  function resize(){ c.width=c.offsetWidth; c.height=c.offsetHeight; }
+  function init(){
+    ns=Array.from({length:N},()=>({
+      x:Math.random()*c.width, y:Math.random()*c.height,
+      vx:(Math.random()-.5)*S, vy:(Math.random()-.5)*S,
+      r:Math.random()*1.5+1
+    }));
+  }
+  function draw(){
+    x.clearRect(0,0,c.width,c.height);
+    for(let i=0;i<ns.length;i++) for(let j=i+1;j<ns.length;j++){
+      const d=Math.hypot(ns[i].x-ns[j].x,ns[i].y-ns[j].y);
+      if(d<D){
+        x.beginPath(); x.strokeStyle=`rgba(0,222,174,${(1-d/D)*0.46})`; x.lineWidth=.65;
+        x.moveTo(ns[i].x,ns[i].y); x.lineTo(ns[j].x,ns[j].y); x.stroke();
+      }
+    }
+    ns.forEach(n=>{
+      x.beginPath(); x.arc(n.x,n.y,n.r,0,Math.PI*2);
+      x.fillStyle='rgba(0,222,174,0.60)'; x.fill();
+      n.x+=n.vx; n.y+=n.vy;
+      if(n.x<0||n.x>c.width) n.vx*=-1;
+      if(n.y<0||n.y>c.height) n.vy*=-1;
+    });
+    r=requestAnimationFrame(draw);
+  }
+  const red=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  window.addEventListener('resize',()=>{ cancelAnimationFrame(r); resize(); init(); if(!red) draw(); });
+  resize(); init(); if(!red) draw();
+})();
+</script>
+</body>
+</html>
