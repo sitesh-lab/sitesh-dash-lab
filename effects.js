@@ -826,12 +826,10 @@
         ctx.lineWidth = hov ? ringW * 1.3 : ringW;
         ctx.strokeStyle = arc.color;
         ctx.globalAlpha = hov ? 1 : 0.82;
-        ctx.shadowColor = arc.color;
-        ctx.shadowBlur = hov ? 18 : 6;
         ctx.beginPath();
         ctx.arc(cx, cy, R, arc.start, arc.end);
         ctx.stroke();
-        ctx.shadowBlur = 0; ctx.globalAlpha = 1;
+        ctx.globalAlpha = 1;
 
         // Tick + label outward
         const baseR = R + ringW * 0.5;
@@ -849,38 +847,26 @@
         ctx.textAlign = right ? 'left' : 'right';
         ctx.textBaseline = 'middle';
         ctx.fillStyle = arc.color;
-        ctx.shadowColor = arc.color; ctx.shadowBlur = hov ? 10 : 0;
         ctx.fillText(arc.label, lx + (right ? 4 : -4), ly);
-        ctx.shadowBlur = 0;
       });
 
-      // Center hub glow
-      const hubR = Math.max(8, R - ringW * 0.5 - 8);
-      const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, hubR);
-      g.addColorStop(0, 'rgba(57,255,20,0.16)');
-      g.addColorStop(1, 'rgba(57,255,20,0)');
-      ctx.fillStyle = g;
-      ctx.beginPath(); ctx.arc(cx, cy, hubR, 0, Math.PI * 2); ctx.fill();
-
-      // Read-head sweep
-      ctx.save();
-      ctx.strokeStyle = 'rgba(0,229,255,0.45)';
-      ctx.lineWidth = 1.5; ctx.shadowColor = '#00e5ff'; ctx.shadowBlur = 8;
+      // Read-head sweep (a quiet hairline, no glow)
+      ctx.strokeStyle = 'rgba(160,190,220,0.35)';
+      ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.moveTo(cx, cy);
-      ctx.lineTo(cx + Math.cos(rot) * (R + ringW * 0.5), cy + Math.sin(rot) * (R + ringW * 0.5));
+      ctx.lineTo(cx + Math.cos(rot) * (R - ringW * 0.5 - 4), cy + Math.sin(rot) * (R - ringW * 0.5 - 4));
       ctx.stroke();
-      ctx.restore();
 
-      // Hub labels
+      // Hub: a plain plasmid-map label (map name + feature count), no monogram
+      const light = document.documentElement.getAttribute('data-theme') === 'light';
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.fillStyle = '#39ff14'; ctx.shadowColor = '#39ff14'; ctx.shadowBlur = 12;
-      ctx.font = '800 ' + Math.max(13, W * 0.045) + 'px "Syne",system-ui,sans-serif';
-      ctx.fillText('SKD', cx, cy - 5);
-      ctx.shadowBlur = 0;
-      ctx.fillStyle = 'rgba(220,228,255,0.55)';
-      ctx.font = '600 ' + Math.max(7, W * 0.016) + 'px "JetBrains Mono",monospace';
-      ctx.fillText('ori · AIR 153', cx, cy + 11);
+      ctx.fillStyle = light ? 'rgba(14,23,41,0.75)' : 'rgba(200,210,230,0.6)';
+      ctx.font = '600 ' + Math.max(7, W * 0.015) + 'px "JetBrains Mono",monospace';
+      ctx.fillText('GENOME MAP', cx, cy - 8);
+      ctx.fillStyle = light ? '#0e1729' : 'rgba(235,240,250,0.9)';
+      ctx.font = '600 ' + Math.max(10, W * 0.028) + 'px "JetBrains Mono",monospace';
+      ctx.fillText(arcs.length + ' sections', cx, cy + 8);
     }
 
     function hit(clientX, clientY) {
