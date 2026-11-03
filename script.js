@@ -972,6 +972,13 @@
       detailContent.appendChild(tpl.content.cloneNode(true));
       detailScreen.classList.add("open");
       detailScreen.setAttribute("aria-hidden", "false");
+      // Titles stay on one line: shrink just the ones too wide for the panel
+      const title = detailContent.querySelector(".detail-title");
+      if (title) {
+        title.style.fontSize = "";
+        const over = title.scrollWidth / (title.clientWidth || 1);
+        if (over > 1) title.style.fontSize = (parseFloat(getComputedStyle(title).fontSize) / over) * 0.98 + "px";
+      }
       document.body.classList.add("detail-open");
       if (window.innerWidth <= 960) document.body.style.overflow = "hidden";
       document.querySelectorAll(".mol-node.active").forEach((n) => n.classList.remove("active"));

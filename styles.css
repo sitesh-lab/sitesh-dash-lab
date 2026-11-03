@@ -3400,6 +3400,20 @@ body { background: var(--bg); color: var(--text); }
 .formula-product { color: var(--purple); }
 .formula-rescue, .lightning-glow { color: var(--neon); }
 
+/* Alignment: card text breaks between items, never inside "Wet-lab" or with
+   a "·" stranded at the start of a line (each separator rides with the item
+   before it; an item wider than the card can still wrap inside itself). */
+.overview > span { display: inline-block; }
+
+/* Panel titles: always one line, sized to fit beside the close button from
+   phone to desktop (longest is "Active Pathway: Remac-PET"). */
+.detail-panel .detail-title {
+  white-space: nowrap;
+  font-size: clamp(0.85rem, 3.5vw, 1.5rem);
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+}
+
 /* Panels */
 .detail-panel { background: linear-gradient(180deg, var(--panel-bg) 0%, var(--panel-bg-2) 100%); }
 /* Anchor panels to the top: when their charts finish loading and the content
@@ -3423,7 +3437,8 @@ body { background: var(--bg); color: var(--text); }
 :root[data-theme="light"] .remac-pathway svg { filter: invert(1) hue-rotate(180deg); }
 /* The genome map draws its own Lab Paper palette (inverting turned its
    purples and pinks pale) */
-:root[data-theme="light"] #plasmid-canvas { filter: none; }
+:root[data-theme="light"] #plasmid-canvas,
+:root[data-theme="light"] #eduEcgCanvas { filter: none; } /* both draw their own deep Lab Paper colours */
 /* Panel text that was hard-coded near-white for dark backgrounds */
 :root[data-theme="light"] .objective p,
 :root[data-theme="light"] .edu-info-body { color: var(--soft); }
