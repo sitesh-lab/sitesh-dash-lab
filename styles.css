@@ -3350,6 +3350,22 @@ body { background: var(--bg); }
 body { background: var(--bg); color: var(--text); }
 #dna-bg, .dna-spine, #bio-cursor { filter: var(--canvas-filter); }
 :root[data-theme="light"] .biolum { opacity: 0.55; }
+
+/* Light mode: white cards at 84% hid the DNA helix and the molecule network.
+   Let the biology show through (text stays dark ink, so it reads fine). */
+:root[data-theme="light"] {
+  --surface: linear-gradient(180deg, color-mix(in srgb, var(--card) 62%, transparent), color-mix(in srgb, var(--card-2) 62%, transparent));
+}
+:root[data-theme="light"] .dna-spine { opacity: 0.8; }
+:root[data-theme="light"] .shape-porphyrin .mol-inner {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--card) 56%, transparent), color-mix(in srgb, var(--card-2) 56%, transparent));
+}
+@media (hover: hover) and (pointer: fine) {
+  :root[data-theme="light"] .mol-node:hover .mol-inner,
+  :root[data-theme="light"] [data-detail]:hover .mol-inner {
+    background: linear-gradient(180deg, color-mix(in srgb, var(--card) 48%, transparent), color-mix(in srgb, var(--card-2) 48%, transparent));
+  }
+}
 .screen-overlay { background: radial-gradient(ellipse 70% 60% at 50% 40%, transparent 0%, var(--vignette) 100%); }
 
 .top { background: var(--header-bg); }
