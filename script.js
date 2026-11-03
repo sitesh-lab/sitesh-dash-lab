@@ -31,21 +31,49 @@
 
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  // Perf: hex parsing is cached — these run hundreds of times per frame.
+  const _rgbCache = new Map();
+  function hexRgb(hex) {
+    let c = _rgbCache.get(hex);
+    if (!c) {
+      c = parseInt(hex.slice(1, 3), 16) + "," + parseInt(hex.slice(3, 5), 16) + "," + parseInt(hex.slice(5, 7), 16);
+      _rgbCache.set(hex, c);
+    }
+    return c;
+  }
+
   function hexAlpha(hex, a) {
-    const r = parseInt(hex.slice(1, 3), 16);
-    const g = parseInt(hex.slice(3, 5), 16);
-    const b = parseInt(hex.slice(5, 7), 16);
-    return `rgba(${r},${g},${b},${a})`;
+    return "rgba(" + hexRgb(hex) + "," + a + ")";
+  }
+
+  // Perf: glows are pre-rendered once per colour and stamped with drawImage.
+  // Building a new radial gradient for every glow every frame was the single
+  // biggest cost of the background canvas.
+  const _glowCache = new Map();
+  function glowSprite(color) {
+    let s = _glowCache.get(color);
+    if (!s) {
+      if (_glowCache.size > 96) _glowCache.clear();
+      s = document.createElement("canvas");
+      s.width = s.height = 64;
+      const c = s.getContext("2d");
+      const g = c.createRadialGradient(32, 32, 0, 32, 32, 32);
+      g.addColorStop(0, hexAlpha(color, 1));
+      g.addColorStop(1, hexAlpha(color, 0));
+      c.fillStyle = g;
+      c.fillRect(0, 0, 64, 64);
+      _glowCache.set(color, s);
+    }
+    return s;
   }
 
   function drawGlow(ctx, x, y, r, color, alpha) {
-    const g = ctx.createRadialGradient(x, y, 0, x, y, r);
-    g.addColorStop(0, hexAlpha(color, alpha));
-    g.addColorStop(1, hexAlpha(color, 0));
-    ctx.fillStyle = g;
-    ctx.beginPath();
-    ctx.arc(x, y, r, 0, Math.PI * 2);
-    ctx.fill();
+    // Quantise blended colours so the sprite cache stays small.
+    const q = (n) => Math.min(255, Math.round(parseInt(color.slice(n, n + 2), 16) / 24) * 24).toString(16).padStart(2, "0");
+    const key = color.length === 7 ? "#" + q(1) + q(3) + q(5) : color;
+    ctx.globalAlpha = Math.min(1, alpha);
+    ctx.drawImage(glowSprite(key), x - r, y - r, r * 2, r * 2);
+    ctx.globalAlpha = 1;
   }
 
   /* ─── Background biochemistry field ─── */
@@ -56,6 +84,17 @@
     bgT = 0;
   let floaters = [];
   let reactions = [];
+  // Mobile: fewer animated elements + pause the background while scrolling (it's
+  // a fixed decorative layer, so pausing its repaint removes scroll jank).
+  const IS_MOBILE = (window.matchMedia && matchMedia("(max-width: 768px)").matches) || ("ontouchstart" in window);
+  let _bgScrollT = 0, _scrollClsT = 0;
+  document.addEventListener("scroll", () => {
+    _bgScrollT = performance.now();
+    // Flag scrolling so CSS pauses animations for a jank-free scroll.
+    if (!document.body.classList.contains("is-scrolling")) document.body.classList.add("is-scrolling");
+    clearTimeout(_scrollClsT);
+    _scrollClsT = setTimeout(() => document.body.classList.remove("is-scrolling"), 120);
+  }, { passive: true, capture: true });
 
   const MAGENTA = "#e040fb";
   const PINK = "#ff3366";
@@ -125,8 +164,9 @@
     reactions = [];
     // More reactions, sampled across ALL templates for colour variety, spread
     // over the whole background in a grid.
-    const rc = Math.min(12, RXN_TEMPLATES.length);
-    const cols = bw > 900 ? 4 : 3, rows = Math.ceil(rc / cols);
+    if (USE_NETWORK) initNetwork();
+    const rc = Math.min(IS_MOBILE ? 6 : USE_NETWORK ? 8 : 12, RXN_TEMPLATES.length);
+    const cols = bw > 900 ? 4 : IS_MOBILE ? 2 : 3, rows = Math.ceil(rc / cols);
     for (let i = 0; i < rc; i++) {
       const rxn = RXN_TEMPLATES[Math.floor((i * RXN_TEMPLATES.length) / rc)];
       const col = i % cols, row = Math.floor(i / cols);
@@ -340,7 +380,13 @@
 
   function resizeBg() {
     if (!bgCanvas || !bgCtx) return;
-    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    // Soft decorative layer behind everything — 1x is indistinguishable and
+    // halves the pixels uploaded to the GPU every frame on hi-DPI screens.
+    const dpr = 1;
+    if (bw === window.innerWidth && bh === window.innerHeight && floaters.length) return;
+    // Mobile URL-bar show/hide only changes the height — keep the molecules
+    // where they are instead of reshuffling them mid-scroll.
+    const reseed = bw !== window.innerWidth || !floaters.length;
     bw = window.innerWidth;
     bh = window.innerHeight;
     bgCanvas.width = bw * dpr;
@@ -348,7 +394,99 @@
     bgCanvas.style.width = bw + "px";
     bgCanvas.style.height = bh + "px";
     bgCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    initFloaters();
+    if (reseed) initFloaters();
+  }
+
+  /* ─── Molecule network (desktop): atoms drift, bond to neighbours and to
+     the mouse. Replaces the floaters where there is a mouse; phones keep the
+     lighter floaters. Bonds are batched into a few strokes per frame. ─── */
+  const USE_NETWORK = !IS_MOBILE && !reducedMotion && window.matchMedia("(pointer: fine)").matches;
+  const NET_COLS = [NEON, CYAN, PURPLE, ORANGE, MAGENTA];
+  const NET_LINK = 130, NET_MOUSE = 200;
+  let netNodes = [];
+  let netMx = -9999, netMy = -9999;
+
+  function initNetwork() {
+    const n = Math.min(70, Math.round((bw * bh) / 20000));
+    netNodes = Array.from({ length: n }, (_, i) => ({
+      x: Math.random() * bw,
+      y: Math.random() * bh,
+      vx: (Math.random() - 0.5) * 0.5,
+      vy: (Math.random() - 0.5) * 0.5,
+      r: 2 + Math.random() * 1.4,
+      color: NET_COLS[i % NET_COLS.length],
+      // a few atoms carry a residue name — keeps the biochemistry readable
+      name: i % 8 === 0 ? pick(AMINO) : null,
+    }));
+  }
+
+  if (USE_NETWORK) {
+    window.addEventListener("pointermove", (e) => { netMx = e.clientX; netMy = e.clientY; }, { passive: true });
+    document.addEventListener("pointerleave", () => { netMx = netMy = -9999; });
+  }
+
+  function drawNetwork(ctx, k) {
+    const BUCKETS = 4;
+    const links = Array.from({ length: BUCKETS }, () => []);
+    const mouseLinks = Array.from({ length: BUCKETS }, () => []);
+
+    for (const p of netNodes) {
+      p.x += p.vx * k;
+      p.y += p.vy * k;
+      if (p.x < -20) p.x = bw + 20; else if (p.x > bw + 20) p.x = -20;
+      if (p.y < -20) p.y = bh + 20; else if (p.y > bh + 20) p.y = -20;
+      const dx = netMx - p.x, dy = netMy - p.y, d = Math.hypot(dx, dy);
+      p.near = d < NET_MOUSE ? 1 - d / NET_MOUSE : 0;
+      if (p.near) {
+        // gentle pull toward the cursor, like a charged probe
+        p.x += dx * 0.006 * k;
+        p.y += dy * 0.006 * k;
+        mouseLinks[Math.min(BUCKETS - 1, (p.near * BUCKETS) | 0)].push(p);
+      }
+    }
+
+    for (let i = 0; i < netNodes.length; i++) {
+      const a = netNodes[i];
+      for (let j = i + 1; j < netNodes.length; j++) {
+        const b = netNodes[j];
+        const dx = a.x - b.x, dy = a.y - b.y;
+        if (dx > NET_LINK || dx < -NET_LINK || dy > NET_LINK || dy < -NET_LINK) continue;
+        const d = Math.hypot(dx, dy);
+        if (d < NET_LINK) links[Math.min(BUCKETS - 1, ((1 - d / NET_LINK) * BUCKETS) | 0)].push(a, b);
+      }
+    }
+
+    ctx.lineWidth = 1;
+    for (let q = 0; q < BUCKETS; q++) {
+      const segs = links[q];
+      if (segs.length) {
+        ctx.strokeStyle = "rgba(150,190,240," + (0.1 + q * 0.09) + ")";
+        ctx.beginPath();
+        for (let s = 0; s < segs.length; s += 2) { ctx.moveTo(segs[s].x, segs[s].y); ctx.lineTo(segs[s + 1].x, segs[s + 1].y); }
+        ctx.stroke();
+      }
+      const ms = mouseLinks[q];
+      if (ms.length) {
+        ctx.strokeStyle = hexAlpha(NEON, 0.22 + q * 0.18);
+        ctx.beginPath();
+        for (const p of ms) { ctx.moveTo(p.x, p.y); ctx.lineTo(netMx, netMy); }
+        ctx.stroke();
+      }
+    }
+
+    ctx.font = "500 9px JetBrains Mono";
+    ctx.textAlign = "center";
+    for (const p of netNodes) {
+      if (p.near > 0.3) drawGlow(ctx, p.x, p.y, 12 + p.near * 10, p.color, p.near * 0.7);
+      ctx.fillStyle = hexAlpha(p.color, 0.75 + p.near * 0.25);
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r + p.near * 1.2, 0, Math.PI * 2);
+      ctx.fill();
+      if (p.name) {
+        ctx.fillStyle = hexAlpha("#eef2ff", 0.22 + p.near * 0.5);
+        ctx.fillText(p.name, p.x, p.y - 7);
+      }
+    }
   }
 
   let _bgLast = 0;
@@ -356,11 +494,18 @@
     requestAnimationFrame(drawBg);
     // Skip drawing when hidden behind an open panel or when the tab is inactive.
     if (document.hidden || document.body.classList.contains("detail-open")) return;
-    if (ts && ts - _bgLast < 42) return; // ~24fps
+    // Pause the (fixed) background while scrolling — its repaint fights scroll compositing.
+    if (performance.now() - _bgScrollT < (IS_MOBILE ? 260 : 140)) return;
+    // ~20fps (every 3rd frame at 60Hz): the molecules drift < 0.5px per frame,
+    // so a higher rate costs main-thread time without looking any smoother.
+    // The desktop network runs at 30fps so its bonds keep up with the mouse.
+    if (ts && ts - _bgLast < (USE_NETWORK ? 30 : 45)) return;
+    // Time-based motion: same speed at any frame rate; clamp after a pause.
+    const k = _bgLast ? Math.min(ts - _bgLast, 100) / 42 : 1;
     _bgLast = ts || 0;
     if (!bgCtx) return;
-    bgCtx.fillStyle = "#05060c";
-    bgCtx.fillRect(0, 0, bw, bh);
+    // Transparent clear: the bioluminescent glow layer sits behind this canvas.
+    bgCtx.clearRect(0, 0, bw, bh);
 
     for (const r of reactions) drawReaction(bgCtx, r);
 
@@ -370,14 +515,20 @@
       if (p < 1) drawReaction(bgCtx, { x: b.x, y: b.y, rxn: b.rxn, dur: 1, phase: 0 }, p);
     }
 
+    if (USE_NETWORK) {
+      drawNetwork(bgCtx, k);
+      if (!reducedMotion) bgT += 42 * k;
+      return;
+    }
+
     drawFloaterInteractions(bgCtx);
 
     for (const f of floaters) {
       if (!reducedMotion) {
-        f.x += f.vx;
-        f.y += f.vy;
-        f.rot += f.vr;
-        f.pulse += 0.018;
+        f.x += f.vx * k;
+        f.y += f.vy * k;
+        f.rot += f.vr * k;
+        f.pulse += 0.018 * k;
         if (f.x < -40) f.x = bw + 40;
         if (f.x > bw + 40) f.x = -40;
         if (f.y < -40) f.y = bh + 40;
@@ -386,7 +537,7 @@
       drawFloater(bgCtx, f);
     }
 
-    if (!reducedMotion) bgT += 42;
+    if (!reducedMotion) bgT += 42 * k;
   }
 
   if (bgCanvas && bgCtx) {
@@ -404,17 +555,32 @@
   let lastSpineH = 0;
   const HELIX_ALPHA = 0.52;
 
+  // Perf: each bead (fill + specular) is pre-rendered once per colour and
+  // stamped with drawImage — ~600 beads a frame were 1200 path fills.
+  const _beadCache = new Map();
+  function beadSprite(color) {
+    let s = _beadCache.get(color);
+    if (!s) {
+      s = document.createElement("canvas");
+      s.width = s.height = 32;
+      const c = s.getContext("2d");
+      c.fillStyle = color;
+      c.beginPath();
+      c.arc(16, 16, 16, 0, Math.PI * 2);
+      c.fill();
+      c.fillStyle = "rgba(238,242,255,0.3)";
+      c.beginPath();
+      c.arc(12, 12, 4.5, 0, Math.PI * 2);
+      c.fill();
+      _beadCache.set(color, s);
+    }
+    return s;
+  }
+
   function drawBead(ctx, x, y, r, color, depth) {
-    // Perf: flat fill + tiny specular (no per-bead radial gradient / shadow).
-    const al = (0.55 + depth * 0.35) * HELIX_ALPHA;
-    ctx.fillStyle = hexAlpha(color, al);
-    ctx.beginPath();
-    ctx.arc(x, y, r, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = hexAlpha("#eef2ff", al * 0.3);
-    ctx.beginPath();
-    ctx.arc(x - r * 0.25, y - r * 0.25, r * 0.28, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.globalAlpha = (0.55 + depth * 0.35) * HELIX_ALPHA;
+    ctx.drawImage(beadSprite(color), x - r, y - r, r * 2, r * 2);
+    ctx.globalAlpha = 1;
   }
 
   function drawSpineHelix() {
@@ -422,10 +588,13 @@
 
     const cw = spineWrap.clientWidth || 300;
     const ch = Math.max(graph.clientHeight, graph.offsetHeight, window.innerHeight * 0.72);
-    spineWrap.style.height = ch + "px";
 
-    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    // Sits behind translucent cards at reduced opacity — 1x is plenty.
+    const dpr = 1;
     if (cw !== lastSpineW || ch !== lastSpineH) {
+      // Only touch styles when the size really changes: writing height every
+      // animation frame invalidated style/layout 25 times a second.
+      spineWrap.style.height = ch + "px";
       lastSpineW = cw;
       lastSpineH = ch;
       spineCanvas.width = Math.round(cw * dpr);
@@ -528,9 +697,16 @@
     requestAnimationFrame(animateSpine);
     // Not visible behind an open panel, and paused when the tab is hidden.
     if (document.hidden || document.body.classList.contains("detail-open")) return;
-    if (ts && ts - _spineLast < 40) return; // ~25fps is plenty for a slow rotation
+    // Stacked (mobile) layout: the spine canvas spans the whole page (~3500px
+    // tall). Re-uploading that 20x a second for a rotation that takes two
+    // minutes isn't worth it — it stays as drawn by layout()/resize.
+    if (lastSpineH > window.innerHeight * 1.6) return;
+    // Hold still while the page scrolls so the compositor only moves pixels.
+    if (performance.now() - _bgScrollT < 140) { _spineLast = 0; return; }
+    if (ts && ts - _spineLast < 45) return; // ~20fps — the rotation is sub-pixel per frame (see drawBg)
+    const k = _spineLast ? Math.min(ts - _spineLast, 100) / 40 : 1;
     _spineLast = ts || 0;
-    if (!reducedMotion) spineRot += 0.0022;
+    if (!reducedMotion) spineRot += 0.0022 * k; // k: elapsed time in units of the original 40ms step
     drawSpineHelix();
   }
 
@@ -568,7 +744,20 @@
     return {
       x: er.left + er.width / 2 - cr.left,
       y: er.top + er.height / 2 - cr.top,
+      hw: er.width / 2,
+      hh: er.height / 2,
     };
+  }
+
+  // Point where the ray from `from` toward `to` leaves `from`'s card, plus a
+  // small gap — bonds meet the card edge instead of running across its text.
+  function rectEdge(from, to, gap) {
+    const dx = to.x - from.x;
+    const dy = to.y - from.y;
+    const len = Math.hypot(dx, dy) || 1;
+    const s = Math.min(dx ? from.hw / Math.abs(dx) : Infinity, dy ? from.hh / Math.abs(dy) : Infinity);
+    const d = Math.min(s * len + gap, len / 2);
+    return { x: from.x + (dx / len) * d, y: from.y + (dy / len) * d };
   }
 
   function drawBondLine(x1, y1, x2, y2, type, targetId) {
@@ -603,13 +792,6 @@
     return g;
   }
 
-  function edgePoint(from, to, inset) {
-    const dx = to.x - from.x;
-    const dy = to.y - from.y;
-    const len = Math.hypot(dx, dy) || 1;
-    return { x: from.x + (dx / len) * inset, y: from.y + (dy / len) * inset };
-  }
-
   function drawBonds() {
     if (!svg || !graph || !core || window.innerWidth <= 960) {
       if (svg) svg.innerHTML = "";
@@ -623,40 +805,26 @@
       const c1 = nodeCenter(node, graph);
       const type = node.dataset.bond || "covalent";
       const targetId = node.dataset.detail || node.querySelector("[data-detail]")?.dataset.detail;
-      svg.appendChild(
-        drawBondLine(
-          edgePoint(c1, c0, 36).x,
-          edgePoint(c1, c0, 36).y,
-          edgePoint(c0, c1, 55).x,
-          edgePoint(c0, c1, 55).y,
-          type,
-          targetId
-        )
-      );
+      const a = rectEdge(c1, c0, 6);
+      const b = rectEdge(c0, c1, 6);
+      svg.appendChild(drawBondLine(a.x, a.y, b.x, b.y, type, targetId));
     });
 
     rightNodes.forEach((node) => {
       const c1 = nodeCenter(node, graph);
       const type = node.dataset.bond || "covalent";
       const targetId = node.dataset.detail || node.querySelector("[data-detail]")?.dataset.detail;
-      svg.appendChild(
-        drawBondLine(
-          edgePoint(c0, c1, 55).x,
-          edgePoint(c0, c1, 55).y,
-          edgePoint(c1, c0, 36).x,
-          edgePoint(c1, c0, 36).y,
-          type,
-          targetId
-        )
-      );
+      const a = rectEdge(c0, c1, 6);
+      const b = rectEdge(c1, c0, 6);
+      svg.appendChild(drawBondLine(a.x, a.y, b.x, b.y, type, targetId));
     });
 
     if (contact) {
       const cc = nodeCenter(contact, graph);
       const targetId = contact.dataset.detail || contact.querySelector("[data-detail]")?.dataset.detail;
-      svg.appendChild(
-        drawBondLine(c0.x, c0.y + 40, cc.x, cc.y - 20, contact.dataset.bond || "peptide", targetId)
-      );
+      const a = rectEdge(c0, cc, 4);
+      const b = rectEdge(cc, c0, 4);
+      svg.appendChild(drawBondLine(a.x, a.y, b.x, b.y, contact.dataset.bond || "peptide", targetId));
     }
   }
 
@@ -671,6 +839,8 @@
     const relayout = () => requestAnimationFrame(() => requestAnimationFrame(layout));
     window.addEventListener("resize", relayout);
     window.addEventListener("load", () => setTimeout(relayout, 200));
+    // Cards enter with a scale animation — re-measure once it has settled.
+    setTimeout(relayout, 1100);
     if (document.fonts?.ready) document.fonts.ready.then(() => setTimeout(relayout, 80));
   }
 
@@ -737,16 +907,33 @@
     setTimeout(() => burst.remove(), 300);
   }
 
+  // "Cell burst": the panel grows as a circle out of the card that was clicked.
   function animatePanelIn(panel, anchor) {
-    const origin = panelOriginFromScreen(anchor.x, anchor.y, panel);
     panel.style.transition = "none";
-    panel.style.transformOrigin = `${origin.x}px ${origin.y}px`;
-    panel.style.transform = "scale(0.04)";
-    panel.style.opacity = "0";
-    void panel.offsetWidth;
-    panel.style.transition = "transform 0.3s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.3s ease";
-    panel.style.transform = "scale(1)";
+    panel.style.transform = "none";
     panel.style.opacity = "1";
+    const origin = panelOriginFromScreen(anchor.x, anchor.y, panel);
+    const w = panel.offsetWidth, h = panel.offsetHeight;
+    const rad = Math.hypot(Math.max(Math.abs(origin.x), Math.abs(w - origin.x)), Math.max(Math.abs(origin.y), Math.abs(h - origin.y)));
+    const at = `at ${origin.x.toFixed(0)}px ${origin.y.toFixed(0)}px`;
+    panel.animate(
+      [
+        { clipPath: `circle(0px ${at})`, transform: "scale(0.97)" },
+        { clipPath: `circle(${rad.toFixed(0)}px ${at})`, transform: "scale(1)" },
+      ],
+      { duration: 620, easing: "cubic-bezier(0.2, 0.8, 0.2, 1)" }
+    );
+  }
+
+  // Open without the bond pulse (phones, or no bond line) but keep the burst.
+  function openWithBurst(finalizeOpen, node) {
+    const panel = detailScreen.querySelector(".detail-panel");
+    const anchor = node
+      ? anchorFromRect((node.querySelector(".mol-inner") || node).getBoundingClientRect())
+      : { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    if (panel) panel.classList.add("custom-anim");
+    finalizeOpen();
+    if (panel) requestAnimationFrame(() => animatePanelIn(panel, anchor));
   }
 
 
@@ -780,8 +967,12 @@
       }
     };
 
-    if (reducedMotion || window.innerWidth <= 960) {
+    if (reducedMotion) {
       finalizeOpen();
+      return;
+    }
+    if (window.innerWidth <= 960) {
+      openWithBurst(finalizeOpen, sourceNode || molNodeForId(id));
       return;
     }
 
@@ -796,14 +987,9 @@
       clickAnchor = null;
     }
     const bondGroup = document.querySelector(`g[data-target-node="${id}"]`);
-    if (!node || !bondGroup || !svg) {
-      finalizeOpen();
-      return;
-    }
-
-    const line = bondGroup.querySelector("line");
-    if (!line) {
-      finalizeOpen();
+    const line = bondGroup && bondGroup.querySelector("line");
+    if (!node || !line || !svg) {
+      openWithBurst(finalizeOpen, node);
       return;
     }
 
@@ -953,13 +1139,52 @@
     if (e.key === "Escape" && detailScreen?.classList.contains("open")) closeDetail();
   });
 
+  // Hover glare follows the pointer; on desktop the card also tilts toward it
+  // in 3D. Measured against the (untilted) wrapper and batched to one update
+  // per frame; only transform + two custom properties change → no layout.
+  const canTilt = !reducedMotion && window.matchMedia("(pointer: fine)").matches;
   document.querySelectorAll(".mol-trigger").forEach((inner) => {
+    const wrap = inner.closest(".mol-wrap") || inner;
+    const max = inner.closest(".mol-core") ? 4 : 9; // the big hero card tilts less
+    let px = 0.5, py = 0.5, raf = 0;
+    const apply = () => {
+      raf = 0;
+      inner.style.setProperty("--mx", px * 100 + "%");
+      inner.style.setProperty("--my", py * 100 + "%");
+      if (canTilt) {
+        inner.style.setProperty("--rx", ((0.5 - py) * max).toFixed(2) + "deg");
+        inner.style.setProperty("--ry", ((px - 0.5) * max * 1.2).toFixed(2) + "deg");
+      }
+    };
     inner.addEventListener("mousemove", (e) => {
-      const r = inner.getBoundingClientRect();
-      inner.style.setProperty("--mx", ((e.clientX - r.left) / r.width) * 100 + "%");
-      inner.style.setProperty("--my", ((e.clientY - r.top) / r.height) * 100 + "%");
+      const r = wrap.getBoundingClientRect();
+      px = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
+      py = Math.min(1, Math.max(0, (e.clientY - r.top) / r.height));
+      if (!raf) raf = requestAnimationFrame(apply);
+    });
+    inner.addEventListener("mouseleave", () => {
+      cancelAnimationFrame(raf);
+      raf = 0;
+      inner.style.setProperty("--rx", "0deg");
+      inner.style.setProperty("--ry", "0deg");
     });
   });
+
+  /* ─── Magnetic buttons: pulled gently toward the pointer, spring back ─── */
+  if (canTilt) {
+    const MAGNET = ".btn-cv, .btn-submit, .social-icon, .detail-close";
+    let magEl = null;
+    document.addEventListener("pointermove", (e) => {
+      const el = e.target.closest?.(MAGNET);
+      if (magEl && magEl !== el) magEl.style.translate = "";
+      magEl = el;
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      const dx = e.clientX - (r.left + r.width / 2);
+      const dy = e.clientY - (r.top + r.height / 2);
+      el.style.translate = `${(dx * 0.3).toFixed(1)}px ${(dy * 0.35).toFixed(1)}px`;
+    }, { passive: true });
+  }
 
   /* ─── Bond electron-flow on node hover/focus + keyboard navigation ─── */
   function setBondActive(id, on) {
@@ -1004,6 +1229,45 @@
     });
   }
 
+  /* ─── Hero: roles type out and cycle (the full list stays in the DOM for
+     screen readers; the typed line is aria-hidden) ─── */
+  (function typeRoles() {
+    const out = document.querySelector(".roles-typed");
+    if (!out || reducedMotion) return;
+    const roles = ["Biochemist", "Molecular Biologist", "Science Communicator", "Science Programming Associate"];
+    let r = 0, i = 0, del = false;
+    out.textContent = "";
+    (function step() {
+      // Idle while a panel covers the hero or the tab is hidden
+      if (document.hidden || document.body.classList.contains("detail-open")) return setTimeout(step, 600);
+      const word = roles[r];
+      i += del ? -1 : 1;
+      out.textContent = word.slice(0, i);
+      let wait = del ? 32 : 68;
+      if (!del && i === word.length) { del = true; wait = 1700; }
+      else if (del && i === 0) { del = false; r = (r + 1) % roles.length; wait = 320; }
+      setTimeout(step, wait);
+    })();
+  })();
+
+  /* ─── Phones: cards rise into place as they scroll into view. Only cards
+     below the fold are armed, so nothing visible on load is ever hidden. ─── */
+  (function riseIn() {
+    if (reducedMotion || !("IntersectionObserver" in window) || window.innerWidth > 960) return;
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        e.target.classList.add("in");
+        io.unobserve(e.target);
+      });
+    }, { rootMargin: "0px 0px -8% 0px", threshold: 0.12 });
+    document.querySelectorAll(".mol-node .mol-wrap").forEach((w) => {
+      if (w.getBoundingClientRect().top < window.innerHeight) return;
+      w.classList.add("rise");
+      io.observe(w);
+    });
+  })();
+
   /* ─── Bio-style circadian clock + partial footer rule ─── */
   const bioClock = document.getElementById("bio-clock");
   const footRule = document.querySelector(".foot-rule");
@@ -1022,29 +1286,39 @@
     const timeStr = `${pad(h)}:${pad(m)}:${pad(s)}`;
     const phase = totalSec >= 6 * 3600 && totalSec < 18 * 3600 ? "Light" : "Dark";
 
-    let tzLabel = "IST";
-    try {
-      const parts = new Intl.DateTimeFormat("en", { timeZoneName: "short" }).formatToParts(now);
-      const tzPart = parts.find((p) => p.type === "timeZoneName");
-      if (tzPart) tzLabel = tzPart.value;
-    } catch (_) {}
-
-    bioClock.innerHTML =
-      `<span class="bio-phase" style="color: #00e5ff;">φ = ${phi}</span> · ` +
-      `<span class="bio-tau" style="color: #ff9f43;">τ_local = ${timeStr} ${tzLabel}</span> · ` +
-      `<span class="bio-zt" style="color: #b44dff;">ZT+${zt}h</span> · ` +
-      `<span class="bio-phase-label" style="color: #39ff14;">${phase}</span>`;
-    bioClock.setAttribute("datetime", now.toISOString());
-
-    if (footRule) {
-      const w = Math.min(bioClock.offsetWidth + 56, window.innerWidth * 0.92);
-      footRule.style.setProperty("--foot-rule-w", `${w}px`);
+    // Perf: build the spans once, then only swap their text each tick (the old
+    // innerHTML rebuild + offsetWidth read re-parsed and re-laid-out every second).
+    if (!bioParts) {
+      bioClock.innerHTML =
+        '<span class="bio-phase"></span> · <span class="bio-tau"></span> · ' +
+        '<span class="bio-zt"></span> · <span class="bio-phase-label"></span>';
+      bioParts = bioClock.querySelectorAll("span");
     }
+    bioParts[0].textContent = `φ = ${phi}`;
+    bioParts[1].textContent = `τ_local = ${timeStr} ${tzLabel}`;
+    bioParts[2].textContent = `ZT+${zt}h`;
+    bioParts[3].textContent = phase;
+    bioClock.setAttribute("datetime", now.toISOString());
+  }
+
+  let bioParts = null;
+  let tzLabel = "IST";
+  try {
+    const tzPart = new Intl.DateTimeFormat("en", { timeZoneName: "short" }).formatToParts(new Date()).find((p) => p.type === "timeZoneName");
+    if (tzPart) tzLabel = tzPart.value;
+  } catch (_) {}
+
+  function sizeFootRule() {
+    if (!footRule || !bioClock) return;
+    const w = Math.min(bioClock.offsetWidth + 56, window.innerWidth * 0.92);
+    footRule.style.setProperty("--foot-rule-w", `${w}px`);
   }
 
   updateBioClock();
+  sizeFootRule();
+  if (document.fonts?.ready) document.fonts.ready.then(sizeFootRule);
   setInterval(updateBioClock, 1000);
-  window.addEventListener("resize", updateBioClock);
+  window.addEventListener("resize", sizeFootRule);
 
   /* ─── Contact Form Handler ─── */
   document.addEventListener("submit", (e) => {
@@ -1350,7 +1624,7 @@
   window.addEventListener('popstate', handleHash);
 
   // ─── Centrifuge intro safety timeout (never gets stuck on slow devices) ───
-  // The cinematic 3D intro (intro3d.js) runs ~11.5s and manages its own dismissal
+  // The self-assembly intro (intro3d.js) runs ~4.4s and manages its own dismissal
   // + safety net, so this legacy 8s cutoff must NOT fire for it — otherwise it
   // chops the animation off mid-sequence. Only guards the lightweight 2D fallback.
   if (window.INTRO_MODE !== '3d') {

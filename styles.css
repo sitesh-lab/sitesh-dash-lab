@@ -15,7 +15,12 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 
-html { scroll-behavior: smooth; }
+html { scroll-behavior: auto; }
+/* Buttery scroll: pause all CSS animations while the user is scrolling (a scroll
+   listener toggles body.is-scrolling). Removes per-frame paint during scroll. */
+body.is-scrolling *,
+body.is-scrolling *::before,
+body.is-scrolling *::after { animation-play-state: paused !important; }
 
 body {
   margin: 0;
@@ -33,6 +38,9 @@ body {
   inset: 0;
   z-index: 0;
   pointer-events: none;
+  transform: translateZ(0);       /* GPU layer → not re-rasterised on scroll */
+  will-change: transform;
+  backface-visibility: hidden;
 }
 
 .screen-overlay {
@@ -40,6 +48,8 @@ body {
   inset: 0;
   z-index: 1;
   pointer-events: none;
+  transform: translateZ(0);
+  will-change: transform;
   background:
     linear-gradient(90deg, rgba(5, 6, 12, 0.55) 0%, transparent 24%, transparent 76%, rgba(5, 6, 12, 0.55) 100%),
     radial-gradient(ellipse 30% 40% at 50% 35%, transparent 0%, rgba(5, 6, 12, 0.25) 100%);
@@ -93,8 +103,6 @@ body {
   z-index: 100;
   width: 100%;
   background: rgba(5, 6, 12, 0.78);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   border-bottom: 2px solid var(--neon);
   box-shadow: 0 1px 0 rgba(57, 255, 20, 0.35), 0 4px 24px rgba(57, 255, 20, 0.08);
 }
@@ -542,13 +550,11 @@ body {
   color: inherit;
   cursor: pointer;
   padding: 1.1rem 1.3rem;
-  background: rgba(8, 14, 28, 0.38);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  background: rgba(8, 14, 28, 0.72);
   border: 1px solid rgba(57, 255, 20, 0.14);
   border-radius: 10px;
   text-shadow: 0 1px 8px rgba(5, 6, 12, 0.7);
-  transition: background 0.35s ease, backdrop-filter 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease, transform 0.3s ease;
+  transition: background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease, transform 0.3s ease;
   animation: card-border-breathe 5s ease-in-out infinite;
 }
 
@@ -605,8 +611,6 @@ body {
 .mol-node:hover .mol-inner,
 .mol-node.active .mol-inner {
   background: rgba(8, 16, 32, 0.92);
-  backdrop-filter: blur(14px) saturate(1.3);
-  -webkit-backdrop-filter: blur(14px) saturate(1.3);
   border-color: rgba(57, 255, 20, 0.5);
   box-shadow: 0 0 32px rgba(57, 255, 20, 0.18), inset 0 0 24px rgba(57, 255, 20, 0.06);
   transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
@@ -890,7 +894,6 @@ body {
   transition: opacity 0.18s ease;
   z-index: 20;
   box-shadow: 0 0 14px rgba(29,158,117,0.25);
-  backdrop-filter: blur(6px);
 }
 .ecg-tooltip.visible { opacity: 1; }
 
@@ -1579,7 +1582,6 @@ body {
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.3s ease;
-  backdrop-filter: blur(8px);
 }
 
 .pathway-detail.visible {
@@ -1655,8 +1657,6 @@ body {
     align-items: stretch;
     max-width: none;
     background: rgba(5, 6, 12, 0.97);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
     padding: 0.5rem 1rem 0.75rem;
     border-bottom: 2px solid var(--neon);
     gap: 0.15rem;
@@ -1744,6 +1744,7 @@ body.detail-open .mol-graph { visibility: hidden !important; }
   scrollbar-width: none;              /* hide scrollbar (still scrollable as fallback) */
   transform: scale(0.94) translateY(22px);
   transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  will-change: transform;            /* GPU-composited open/close → no stutter */
 }
 
 .detail-screen.open .detail-panel:not(.custom-anim) {
@@ -2365,7 +2366,6 @@ a, button, input, textarea, label, select {
   transform: translate(-50%, -120%);
   transition: opacity 0.18s;
   z-index: 10;
-  backdrop-filter: blur(6px);
 }
 .edu-tooltip.visible { opacity: 1; }
 .edu-info-box {
@@ -2603,7 +2603,6 @@ a, button, input, textarea, label, select {
   background: rgba(8, 14, 28, 0.45);
   border: 1px solid rgba(57, 255, 20, 0.14);
   border-radius: 12px;
-  backdrop-filter: blur(6px);
   box-shadow: 0 0 32px rgba(0, 229, 255, 0.18), inset 0 0 24px rgba(0, 229, 255, 0.06);
 }
 .btn-go-back {
@@ -2752,3 +2751,545 @@ a, button, input, textarea, label, select {
   .intro-word:nth-child(n) { letter-spacing: 0.2em; }
 }
 
+/* ══════════════════════════════════════════════════════════════════════
+   DESIGN REFRESH — calmer, sharper "precision lab" look.
+   Lives last so it wins the cascade over the older rules above.
+   Perf rule for everything here: anything that loops or follows the
+   pointer animates only transform/opacity (compositor-only, no repaint).
+   ══════════════════════════════════════════════════════════════════════ */
+:root {
+  --bg: #060912;
+  --text: #e8edf7;
+  --muted: #8d9ab3;
+  --soft: #b8c3d8;
+  --line: rgba(148, 170, 210, 0.13);
+  --line-strong: rgba(148, 170, 210, 0.24);
+  --surface: linear-gradient(180deg, rgba(16, 24, 42, 0.9) 0%, rgba(8, 13, 25, 0.9) 100%);
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --acc: var(--neon);
+}
+
+/* Per-section accent — one variable drives tick, hint, hover border + glow */
+[data-detail="about"], [data-detail="education"], [data-detail="contact"] { --acc: var(--cyan); }
+[data-detail="experience"], [data-detail="life"] { --acc: #ff9f43; }
+[data-detail="skills"], [data-detail="ambition"] { --acc: var(--purple); }
+
+body { background: var(--bg); }
+
+/* Background: quieter, so the content leads */
+#dna-bg { opacity: 0.72; }
+.dna-spine { opacity: 0.4; }
+.screen-overlay {
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 40%, transparent 0%, rgba(6, 9, 18, 0.55) 100%),
+    linear-gradient(90deg, rgba(6, 9, 18, 0.5) 0%, transparent 22%, transparent 78%, rgba(6, 9, 18, 0.5) 100%);
+}
+/* CRT scanlines + phosphor flicker retired: dated look, and a full-screen
+   animated layer composited on every frame. */
+.screen-overlay::before,
+.screen-overlay::after { content: none; animation: none; }
+
+/* ─── Header ─── */
+.top {
+  background: linear-gradient(180deg, rgba(6, 9, 18, 0.94), rgba(6, 9, 18, 0.84));
+  border-bottom: 1px solid var(--line);
+  box-shadow: none;
+}
+.top::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -1px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(57, 255, 20, 0.55) 50%, transparent 100%);
+  pointer-events: none;
+}
+.top-inner { padding-top: 0.55rem; padding-bottom: 0.55rem; }
+
+.logo {
+  color: var(--text);
+  text-shadow: none;
+  letter-spacing: 0.14em;
+}
+.status-light {
+  width: 0.45rem;
+  height: 0.45rem;
+  background: var(--neon);
+  box-shadow: 0 0 0 3px rgba(57, 255, 20, 0.14);
+  animation: status-breathe 2.8s ease-in-out infinite;
+}
+@keyframes status-breathe {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+
+.brand-mark {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 0.66rem;
+  letter-spacing: 0.22em;
+  color: var(--muted);
+  text-shadow: none;
+}
+
+.nav { gap: 1.6rem; }
+.nav a {
+  position: relative;
+  color: var(--muted);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  padding: 0.35rem 0;
+  transition: color 0.25s ease;
+}
+.nav a::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 1px;
+  background: var(--neon);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s var(--ease-out);
+}
+.nav a:hover,
+.nav a.active {
+  color: var(--text);
+  text-shadow: none;
+  border-bottom: 0;
+  padding-bottom: 0.35rem;
+}
+.nav a:hover::after,
+.nav a.active::after { transform: scaleX(1); }
+
+.social-icon { opacity: 0.8; }
+.social-icon:hover { color: var(--text); filter: none; }
+
+/* ─── Cards ─── */
+.mol-node {
+  transition: transform 0.4s var(--ease-out);
+  /* "both" kept the last keyframe's transform applied forever, which silently
+     overrode the hover transform. "backwards" only fills the entry delay. */
+  animation-fill-mode: backwards;
+}
+.mol-node:hover,
+.mol-node.active {
+  transform: translateY(-3px);
+  filter: none;
+}
+
+.mol-inner,
+.mol-trigger {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  text-shadow: none;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 14px 34px -18px rgba(0, 0, 0, 0.85);
+  transition: border-color 0.35s ease;
+  animation: none;
+}
+
+/* One shape language: the mixed ovals/pills read as accidental */
+.shape-benzene .mol-inner, .shape-helix .mol-inner, .shape-flask .mol-inner,
+.shape-purine .mol-inner, .shape-sheet .mol-inner, .shape-mito .mol-inner,
+.shape-cyclo .mol-inner, .shape-vesicle .mol-inner, .shape-phospho .mol-inner,
+.shape-porphyrin .mol-inner { border-radius: 14px; }
+
+.mol-outline { opacity: 0.07; }
+.mol-node:hover .mol-outline,
+.mol-node.active .mol-outline { opacity: 0.2; }
+
+/* Accent tick replaces the corner brackets */
+.mol-inner::before {
+  top: -1px;
+  left: 50%;
+  width: 40px;
+  height: 2px;
+  margin-left: -20px;
+  border: 0;
+  border-radius: 0 0 2px 2px;
+  background: var(--acc);
+  opacity: 0.75;
+  transform-origin: center;
+  transition: transform 0.4s var(--ease-out), opacity 0.3s ease;
+}
+.mol-node:hover .mol-inner::before,
+.mol-node.active .mol-inner::before { transform: scaleX(2.2); opacity: 1; }
+
+/* Hover glow layer — follows the pointer via --mx/--my, fades with opacity */
+.mol-inner::after,
+.mol-node:not(.mol-core) .mol-inner::after {
+  top: 0; left: 0; right: 0; bottom: 0;
+  width: auto;
+  height: auto;
+  border: 0;
+  border-radius: inherit;
+  background: radial-gradient(circle at var(--mx, 50%) var(--my, 0%), color-mix(in srgb, var(--acc) 14%, transparent), transparent 65%);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.mol-node:hover .mol-inner::after,
+.mol-node.active .mol-inner::after { opacity: 1; }
+
+.mol-node:hover .mol-inner,
+.mol-node.active .mol-inner,
+[data-detail]:hover .mol-inner,
+[data-detail].active .mol-inner {
+  background: var(--surface);
+  border-color: color-mix(in srgb, var(--acc) 45%, transparent);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 18px 40px -18px rgba(0, 0, 0, 0.9);
+}
+
+.mol-inner h2 {
+  font-size: 0.86rem;
+  letter-spacing: 0.16em;
+  color: var(--text);
+  text-shadow: none;
+  margin-bottom: 0.45rem;
+}
+
+.overview,
+.mol-inner p,
+.mol-inner li { color: var(--soft); }
+.overview { font-size: 0.8rem; line-height: 1.6; }
+
+.tap-hint,
+[data-detail] .tap-hint {
+  display: inline-block;
+  width: auto;
+  color: var(--acc);
+  opacity: 0.85;
+  font-size: 0.64rem;
+  letter-spacing: 0.16em;
+  margin-top: 0.45rem;
+  transition: transform 0.35s var(--ease-out), opacity 0.25s ease;
+}
+.mol-node:hover .tap-hint,
+.mol-node.active .tap-hint {
+  animation: none;
+  text-shadow: none;
+  opacity: 1;
+  transform: translateX(4px);
+}
+
+/* ─── Hero card ─── */
+.shape-porphyrin .mol-inner {
+  background: linear-gradient(180deg, rgba(14, 22, 40, 0.86) 0%, rgba(7, 11, 22, 0.86) 100%);
+  border-color: var(--line);
+  padding: 2rem 1.75rem 1.6rem;
+}
+.mol-core:hover,
+.mol-core.active { transform: none; }
+
+.core-headshot {
+  width: 116px;
+  height: 116px;
+  box-shadow:
+    0 0 0 2px rgba(57, 255, 20, 0.85),
+    0 0 0 7px rgba(57, 255, 20, 0.07),
+    0 16px 36px -10px rgba(57, 255, 20, 0.35);
+  transition: transform 0.45s var(--ease-out);
+}
+
+.badge {
+  color: var(--soft);
+  background: rgba(255, 255, 255, 0.03);
+  border-color: var(--line-strong);
+  letter-spacing: 0.14em;
+  font-size: 0.62rem;
+  padding: 0.34rem 0.75rem;
+}
+.badge::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-right: 0.5rem;
+  border-radius: 50%;
+  background: var(--neon);
+  vertical-align: 1px;
+}
+
+.mol-name,
+.glitch-name {
+  font-size: clamp(1.9rem, 4.4vw, 2.9rem);
+  letter-spacing: 0.03em;
+  line-height: 1.04;
+  margin-bottom: 0.75rem;
+  color: var(--text);
+  background: linear-gradient(180deg, #ffffff 0%, #d9e6f5 55%, #8dffa8 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: none;
+}
+
+.roles {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+}
+/* Wrap between roles, never inside one */
+.roles span { white-space: nowrap; }
+
+/* ─── Bonds: hairlines at rest; only the hovered one carries current ─── */
+.mol-bonds .bond line {
+  filter: none;
+  animation: none;
+  opacity: 0.32;
+  stroke-width: 1.2;
+}
+.bond-hydrogen line { opacity: 0.24 !important; }
+.bond.bond-active line {
+  opacity: 0.95 !important;
+  stroke-width: 1.6;
+  filter: none;
+}
+
+/* Bond legend: moved to the top edge — at the bottom it collided with Contact */
+.mol-graph::before {
+  top: 0.45rem;
+  bottom: auto;
+  font-size: 0.56rem;
+  letter-spacing: 0.08em;
+  opacity: 0.5;
+}
+
+/* ─── Footer ─── */
+.bio-clock {
+  color: var(--muted);
+  text-shadow: none;
+  font-weight: 500;
+}
+.bio-clock .bio-phase { color: var(--cyan); }
+.bio-clock .bio-tau { color: var(--soft); }
+.bio-clock .bio-zt { color: var(--purple); }
+.bio-clock .bio-phase-label { color: var(--neon); }
+.foot-rule {
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(57, 255, 20, 0.6) 50%, transparent 100%);
+  box-shadow: none;
+}
+.foot-copy { color: var(--muted); }
+.copyright-symbol { color: var(--muted); }
+.copyright-name { color: var(--soft); font-weight: 600; letter-spacing: 0.14em; }
+.formula { opacity: 0.7; }
+.formula-rescue { text-shadow: none; }
+.lightning-glow {
+  animation: none;
+  filter: none;
+  text-shadow: none;
+}
+
+/* ─── Detail panel ─── */
+.detail-panel {
+  background: linear-gradient(180deg, #0c1324 0%, #080d19 100%);
+  border: 1px solid var(--line-strong);
+  box-shadow: 0 40px 90px -30px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(57, 255, 20, 0.05);
+}
+.detail-close {
+  border-color: var(--line-strong);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--soft);
+  transition: background 0.2s, color 0.2s, transform 0.3s var(--ease-out);
+}
+.detail-close:hover {
+  background: rgba(255, 255, 255, 0.09);
+  color: var(--text);
+  box-shadow: none;
+  transform: rotate(90deg);
+}
+
+.btn-cv { border-radius: 8px; transition: background 0.2s, border-color 0.2s; }
+.btn-cv:hover { box-shadow: none; border-color: rgba(57, 255, 20, 0.85); }
+
+/* Desktop is designed as one screen, but body was overflow:hidden — on short
+   laptop screens (≤ ~860px tall) the lower cards slid under the footer and
+   could not be reached. Let it scroll when it must, and compact first. */
+@media (min-width: 961px) {
+  html, body { height: auto; overflow-y: auto; }
+  body { max-height: none; min-height: 100vh; }
+}
+@media (min-width: 961px) and (max-height: 860px) {
+  .mol-inner, .mol-trigger { padding: 0.8rem 1rem; min-height: 0; }
+  .shape-porphyrin .mol-inner { padding: 1.25rem 1.5rem 1rem; }
+  .core-headshot { width: 84px; height: 84px; margin-bottom: 0.6rem; }
+  .mol-name, .glitch-name { font-size: clamp(1.6rem, 3.4vw, 2.3rem); margin-bottom: 0.5rem; }
+  .badge { margin-bottom: 0.4rem; }
+  .roles { margin-bottom: 0.35rem; }
+  .overview { font-size: 0.76rem; line-height: 1.5; margin-bottom: 0.2rem; }
+  .mol-inner h2 { margin-bottom: 0.3rem; }
+  .tap-hint, [data-detail] .tap-hint { margin-top: 0.25rem; }
+  .mol-left, .mol-right { padding-top: 1.75rem; }
+}
+
+/* Mobile menu: `.nav { width: max-content }` beat left/right:0, so the menu
+   opened as a thin see-through column over the hero. Full-width sheet now. */
+@media (max-width: 960px) {
+  .nav-toggle {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--line-strong);
+    border-radius: 10px;
+    color: var(--text);
+  }
+  .nav {
+    width: auto;
+    background: #070b15;
+    border-bottom: 1px solid var(--line-strong);
+    box-shadow: 0 24px 40px -12px rgba(0, 0, 0, 0.8);
+    padding: 0.5rem 1.25rem 1rem;
+  }
+  .nav.open { animation: nav-drop 0.3s var(--ease-out); }
+  .nav a {
+    justify-content: space-between;
+    padding: 0.55rem 0.25rem;
+    font-size: 0.78rem;
+    color: var(--soft);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav a::after {
+    position: static;
+    content: "→";
+    height: auto;
+    background: none;
+    color: var(--muted);
+    transform: none;
+  }
+  .nav a:hover::after,
+  .nav a.active::after { color: var(--neon); }
+}
+@keyframes nav-drop {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (max-width: 960px) {
+  .mol-node:not(.mol-core)::before {
+    width: 1px;
+    background: linear-gradient(var(--line-strong), transparent);
+    opacity: 1;
+  }
+  .mol-node:hover,
+  .mol-node.active { transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .status-light { animation: none; }
+  .mol-node:hover,
+  .mol-node.active,
+  .mol-node:hover .tap-hint { transform: none; }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   FX PACK — typing roles, 3D tilt + glare, magnetic buttons,
+   bioluminescent glow, rise-in on scroll. (Network + cell-burst panel
+   live in script.js.) Same rule: transform/opacity only.
+   ══════════════════════════════════════════════════════════════════════ */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Typing roles — fixed line height so typing never shifts the layout */
+.roles { min-height: 1.6em; text-transform: uppercase; }
+.roles-typed { color: var(--soft); }
+.roles .caret {
+  display: inline-block;
+  width: 2px;
+  height: 1.05em;
+  margin-left: 4px;
+  vertical-align: -2px;
+  background: var(--neon);
+  animation: caret-blink 1s steps(1) infinite;
+}
+@keyframes caret-blink { 50% { opacity: 0; } }
+
+/* 3D tilt — JS sets --rx/--ry on desktop; quick follow while hovering,
+   slow settle back on leave */
+.mol-inner,
+.mol-trigger {
+  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition: border-color 0.35s ease, transform 0.7s var(--ease-out);
+}
+.mol-node:hover .mol-inner,
+.mol-node.active .mol-inner {
+  transition: border-color 0.35s ease, transform 0.15s ease-out;
+}
+/* Glare: a white highlight on top of the section-colour glow */
+.mol-inner::after,
+.mol-node:not(.mol-core) .mol-inner::after {
+  background:
+    radial-gradient(circle at var(--mx, 50%) var(--my, 0%), rgba(255, 255, 255, 0.07), transparent 38%),
+    radial-gradient(circle at var(--mx, 50%) var(--my, 0%), color-mix(in srgb, var(--acc) 14%, transparent), transparent 65%);
+}
+
+/* Magnetic buttons — JS sets the independent `translate` property */
+.btn-cv { transition: background 0.2s, border-color 0.2s, translate 0.45s var(--ease-out); }
+.social-icon { transition: color 0.2s, opacity 0.2s, translate 0.45s var(--ease-out); }
+.detail-close { transition: background 0.2s, color 0.2s, transform 0.3s var(--ease-out), translate 0.45s var(--ease-out); }
+
+/* Bioluminescent glow — radial gradients (no blur filter), drifting slowly */
+.biolum {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.biolum span {
+  position: absolute;
+  width: 62vmax;
+  height: 62vmax;
+  border-radius: 50%;
+  will-change: transform;
+}
+.biolum span:nth-child(1) {
+  left: -18vmax; top: -22vmax;
+  background: radial-gradient(circle, rgba(57, 255, 20, 0.13) 0%, transparent 62%);
+  animation: biolum-a 28s ease-in-out infinite alternate;
+}
+.biolum span:nth-child(2) {
+  right: -24vmax; top: 4vh;
+  background: radial-gradient(circle, rgba(0, 229, 255, 0.12) 0%, transparent 62%);
+  animation: biolum-b 34s ease-in-out infinite alternate;
+}
+.biolum span:nth-child(3) {
+  left: 18vw; bottom: -34vmax;
+  background: radial-gradient(circle, rgba(180, 77, 255, 0.14) 0%, transparent 62%);
+  animation: biolum-c 31s ease-in-out infinite alternate;
+}
+@keyframes biolum-a { to { transform: translate(22vw, 18vh) scale(1.12); } }
+@keyframes biolum-b { to { transform: translate(-26vw, 22vh) scale(0.9); } }
+@keyframes biolum-c { to { transform: translate(14vw, -24vh) scale(1.15); } }
+
+/* Rise-in on scroll (stacked/phone layout only; JS arms off-screen cards) */
+@media (max-width: 960px) {
+  .mol-wrap.rise {
+    opacity: 0;
+    transform: translateY(28px) scale(0.98);
+    transition: opacity 0.7s var(--ease-out), transform 0.7s var(--ease-out);
+  }
+  .mol-wrap.rise.in { opacity: 1; transform: none; }
+}
+
+/* Intro skip button — matches the refreshed chrome */
+#centri-skip {
+  z-index: 5;
+  top: max(1.2rem, env(safe-area-inset-top, 0px));
+  color: var(--soft);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  padding: 0.35rem 0.8rem;
+  letter-spacing: 0.12em;
+}
+#centri-skip:hover { background: rgba(255, 255, 255, 0.09); color: var(--text); }
+
+@media (prefers-reduced-motion: reduce) {
+  .biolum span, .roles .caret { animation: none; }
+  .mol-inner, .mol-trigger { transform: none; }
+}

@@ -713,6 +713,9 @@
   if (detailScreen && detailContent) {
     // Watch childList of detail-content (fired AFTER script.js cloneNodes)
     const co = new MutationObserver(() => {
+      // Defer heavy canvas-effect init until AFTER the panel's ~0.4s open
+      // animation finishes — initialising them mid-animation caused the open to
+      // stutter. Panel text is already visible; the effect just starts a beat later.
       setTimeout(() => {
         if (detailScreen.getAttribute('aria-hidden') !== 'false') return;
 
@@ -735,7 +738,7 @@
         tryInitMicroscope();
         tryInitSynapse();
         tryInitCells();
-      }, 90);
+      }, 430);
     });
     co.observe(detailContent, { childList: true });
   }
@@ -2038,45 +2041,76 @@
     const N = 15;
     const mol = Array.from({ length: N }, (_, i) => ({
       x: Math.random() * W, y: Math.random() * H,
-      vx: (Math.random() - 0.5) * 0.28, vy: (Math.random() - 0.5) * 0.24,
-      r: 7 + Math.random() * 10, rot: Math.random() * 6.28, vr: (Math.random() - 0.5) * 0.01,
-      col: COLS[i % COLS.length], kind: i % 3, ph: Math.random() * 6.28,
+      vx: (Math.random() - 0.5) * 0.3, vy: (Math.random() - 0.5) * 0.26,
+      r: 7 + Math.random() * 10, rot: Math.random() * 6.28, vr: (Math.random() - 0.5) * 0.012,
+      col: COLS[i % COLS.length], kind: i % 3, ph: Math.random() * 6.28, flash: 0,
     }));
+    const sparks = [];       // monomers released by enzymatic cleavage
+    let _nextRxn = 900;
 
     function frame(ts) {
       if (!document.body.contains(canvas)) { canvas._cellsInit = false; return; }
       requestAnimationFrame(frame);
       if (performance.now() - _scrollT < 160) return;   // pause during/just after scroll
-      if (ts && ts - _last < 40) return;                 // ~25fps
+      if (ts && ts - _last < 38) return;
       _last = ts || 0;
       ctx.clearRect(0, 0, W, H);
       const t = (ts || 0) * 0.001;
 
-      // faint bonds between nearby molecules
+      // enzymatic reaction event: a molecule is cleaved → flashes + emits monomers
+      if ((ts || 0) > _nextRxn) {
+        _nextRxn = (ts || 0) + 1100 + Math.random() * 1500;
+        const m = mol[(Math.random() * N) | 0]; m.flash = 1;
+        for (let k = 0; k < 4; k++) {
+          const a = Math.random() * 6.283, sp = 0.8 + Math.random() * 1.9;
+          sparks.push({ x: m.x, y: m.y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, life: 1, col: COLS[(Math.random() * COLS.length) | 0] });
+        }
+      }
+
+      // bonds + a signal pulse travelling along each active bond
       for (let i = 0; i < N; i++) {
         for (let j = i + 1; j < N; j++) {
           const a = mol[i], b = mol[j], dx = a.x - b.x, dy = a.y - b.y, d = Math.hypot(dx, dy);
-          if (d < 125) { ctx.strokeStyle = 'rgba(130,200,255,' + (0.13 * (1 - d / 125)) + ')'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke(); }
+          if (d < 132) {
+            const k = 1 - d / 132;
+            ctx.strokeStyle = 'rgba(130,200,255,' + (0.16 * k) + ')'; ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+            const ph = ((t * 0.5) + (i * 3 + j) * 0.17) % 1;
+            ctx.fillStyle = a.col; ctx.globalAlpha = 0.5 * k; ctx.shadowColor = a.col; ctx.shadowBlur = 6;
+            ctx.beginPath(); ctx.arc(a.x + (b.x - a.x) * ph, a.y + (b.y - a.y) * ph, 1.8, 0, 6.283); ctx.fill();
+            ctx.globalAlpha = 1; ctx.shadowBlur = 0;
+          }
         }
       }
-      // molecules
+
+      // released monomers
+      for (let i = sparks.length - 1; i >= 0; i--) {
+        const s = sparks[i]; s.x += s.vx; s.y += s.vy; s.life -= 0.012;
+        if (s.life <= 0) { sparks.splice(i, 1); continue; }
+        ctx.fillStyle = s.col; ctx.globalAlpha = s.life * 0.8; ctx.shadowColor = s.col; ctx.shadowBlur = 6;
+        ctx.beginPath(); ctx.arc(s.x, s.y, 1.4 + s.life * 1.6, 0, 6.283); ctx.fill();
+      }
+      ctx.globalAlpha = 1; ctx.shadowBlur = 0;
+
+      // molecules (pulsing; flare when cleaved)
       for (const m of mol) {
         m.x += m.vx; m.y += m.vy; m.rot += m.vr;
         if (m.x < -24) m.x = W + 24; else if (m.x > W + 24) m.x = -24;
         if (m.y < -24) m.y = H + 24; else if (m.y > H + 24) m.y = -24;
-        const pulse = 0.72 + 0.28 * Math.sin(t * 1.5 + m.ph);
+        if (m.flash > 0) m.flash -= 0.03;
+        const pulse = 0.72 + 0.28 * Math.sin(t * 1.6 + m.ph), fl = Math.max(0, m.flash), rr = m.r * (1 + fl * 0.25);
         ctx.save(); ctx.translate(m.x, m.y); ctx.rotate(m.rot);
-        ctx.strokeStyle = m.col; ctx.fillStyle = m.col; ctx.globalAlpha = 0.62 * pulse;
-        ctx.lineWidth = 1.6; ctx.shadowColor = m.col; ctx.shadowBlur = 8;
+        ctx.strokeStyle = m.col; ctx.fillStyle = m.col; ctx.globalAlpha = Math.min(1, 0.64 * pulse + fl * 0.5);
+        ctx.lineWidth = 1.8; ctx.shadowColor = m.col; ctx.shadowBlur = 9 + fl * 20;
         if (m.kind === 0) {          // hexagon ring
-          ctx.beginPath(); for (let k = 0; k < 6; k++) { const an = k / 6 * 6.283; k ? ctx.lineTo(Math.cos(an) * m.r, Math.sin(an) * m.r) : ctx.moveTo(Math.cos(an) * m.r, Math.sin(an) * m.r); } ctx.closePath(); ctx.stroke();
+          ctx.beginPath(); for (let k = 0; k < 6; k++) { const an = k / 6 * 6.283; k ? ctx.lineTo(Math.cos(an) * rr, Math.sin(an) * rr) : ctx.moveTo(Math.cos(an) * rr, Math.sin(an) * rr); } ctx.closePath(); ctx.stroke();
         } else if (m.kind === 1) {   // ring + orbiting atom
-          ctx.beginPath(); ctx.arc(0, 0, m.r * 0.8, 0, 6.283); ctx.stroke();
-          ctx.beginPath(); ctx.arc(m.r * 0.8, 0, 2.2, 0, 6.283); ctx.fill();
+          ctx.beginPath(); ctx.arc(0, 0, rr * 0.8, 0, 6.283); ctx.stroke();
+          ctx.beginPath(); ctx.arc(rr * 0.8, 0, 2.2, 0, 6.283); ctx.fill();
         } else {                     // nucleotide dumbbell
-          ctx.beginPath(); ctx.moveTo(-m.r, 0); ctx.lineTo(m.r, 0); ctx.stroke();
-          ctx.beginPath(); ctx.arc(-m.r, 0, 2.4, 0, 6.283); ctx.fill();
-          ctx.beginPath(); ctx.arc(m.r, 0, 2.4, 0, 6.283); ctx.fill();
+          ctx.beginPath(); ctx.moveTo(-rr, 0); ctx.lineTo(rr, 0); ctx.stroke();
+          ctx.beginPath(); ctx.arc(-rr, 0, 2.4, 0, 6.283); ctx.fill();
+          ctx.beginPath(); ctx.arc(rr, 0, 2.4, 0, 6.283); ctx.fill();
         }
         ctx.restore(); ctx.globalAlpha = 1; ctx.shadowBlur = 0;
       }
@@ -2364,6 +2398,7 @@
      Scroll wheel creates glowing bonds between floaters
   ============================================================ */
   (function bgScrollBonds() {
+    return; // disabled: this drew O(n²) bond lines on every wheel/scroll → scroll jank
     if (REDUCED) return;
     const bgCanvas = document.getElementById('dna-bg');
     if (!bgCanvas) return;
