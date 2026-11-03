@@ -20,7 +20,10 @@
   if (oldLog) oldLog.style.display = "none";
 
   overlay.style.display = "block";
-  overlay.style.background = "#060912"; // solid until the first frame; then the canvas paints (and fades) it
+  // Follows the site theme (set in <head> before this runs): OLED Black or Lab Paper.
+  const LIGHT = document.documentElement.getAttribute("data-theme") === "light";
+  const BG = LIGHT ? [[236, 241, 249], [243, 246, 251]] : [[10, 12, 18], [0, 0, 0]]; // centre, edge
+  overlay.style.background = "rgb(" + BG[1] + ")"; // solid until the first frame; then the canvas paints (and fades) it
   document.body.style.overflow = "hidden";
 
   const canvas = document.getElementById("centrifuge-canvas") || overlay.appendChild(document.createElement("canvas"));
@@ -30,8 +33,9 @@
 
   const NAME = "SITESH KUMAR DASH";
   const ROLES = "BIOCHEMIST · MOLECULAR BIOLOGIST · SCIENCE COMMUNICATOR";
-  const COLS = ["#39ff14", "#00e5ff", "#b44dff", "#ff9f43", "#ff3366"];
-  const SETTLED = "#dfe8f5", HOT = "#8dffa8";
+  const COLS = LIGHT ? ["#0f9d4a", "#0088a8", "#7a3ee0", "#c4610a", "#d12a5c"] : ["#39ff14", "#00e5ff", "#b44dff", "#ff9f43", "#ff3366"];
+  const SETTLED = LIGHT ? "#1d2b45" : "#dfe8f5", HOT = LIGHT ? "#0f9d4a" : "#8dffa8";
+  const ROLES_COL = LIGHT ? "#66738c" : "#8a909c";
   const NAME_FONT = '800 100px Syne, "Arial Black", sans-serif';
 
   // Timeline (seconds)
@@ -139,8 +143,8 @@
     ctx.clearRect(0, 0, W, H);
     if (bgA > 0) {
       const g = ctx.createRadialGradient(W / 2, H * 0.45, 0, W / 2, H * 0.45, Math.max(W, H) * 0.75);
-      g.addColorStop(0, "rgba(14,22,42," + bgA + ")");
-      g.addColorStop(1, "rgba(6,9,18," + bgA + ")");
+      g.addColorStop(0, "rgba(" + BG[0] + "," + bgA + ")");
+      g.addColorStop(1, "rgba(" + BG[1] + "," + bgA + ")");
       ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
     }
 
@@ -185,7 +189,7 @@
       ctx.font = "500 " + fs + 'px "JetBrains Mono", monospace';
       if ("letterSpacing" in ctx) ctx.letterSpacing = (fs * 0.16).toFixed(1) + "px";
       ctx.textAlign = "center"; ctx.textBaseline = "middle";
-      ctx.fillStyle = "#8d9ab3";
+      ctx.fillStyle = ROLES_COL;
       if (W < 700) ROLES.split(" · ").forEach((r, i) => ctx.fillText(r, W / 2, rolesY + i * fs * 1.7));
       else ctx.fillText(ROLES, W / 2, rolesY);
       if ("letterSpacing" in ctx) ctx.letterSpacing = "0px";

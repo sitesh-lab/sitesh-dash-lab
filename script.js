@@ -378,12 +378,29 @@
     }
   }
 
-  function resizeBg() {
+  // Adaptive sharpness: the canvases start at the screen's real resolution
+  // (capped at 2×; 1.5× on phones; 1.25× on ≤4-core devices) and step down by
+  // 0.5× whenever a background frame costs more than ~6ms on average — so on
+  // any device smoothness wins over sharpness.
+  const DPR_CAP = Math.min(window.devicePixelRatio || 1, IS_MOBILE ? 1.5 : 2);
+  let canvasDpr = (navigator.hardwareConcurrency || 8) <= 4 ? Math.min(DPR_CAP, 1.25) : DPR_CAP;
+  let bgCost = 0, bgSamples = 0;
+  function trackBgCost(t0) {
+    bgCost = bgCost * 0.9 + (performance.now() - t0) * 0.1;
+    if (++bgSamples < 40) return;
+    bgSamples = 0;
+    if (bgCost > 6 && canvasDpr > 1) {
+      canvasDpr = Math.max(1, canvasDpr - 0.5);
+      resizeBg(true);
+      lastSpineW = 0; // force the spine to re-allocate at the new resolution
+      drawSpineHelix();
+    }
+  }
+
+  function resizeBg(force) {
     if (!bgCanvas || !bgCtx) return;
-    // Soft decorative layer behind everything — 1x is indistinguishable and
-    // halves the pixels uploaded to the GPU every frame on hi-DPI screens.
-    const dpr = 1;
-    if (bw === window.innerWidth && bh === window.innerHeight && floaters.length) return;
+    const dpr = canvasDpr;
+    if (!force && bw === window.innerWidth && bh === window.innerHeight && floaters.length) return;
     // Mobile URL-bar show/hide only changes the height — keep the molecules
     // where they are instead of reshuffling them mid-scroll.
     const reseed = bw !== window.innerWidth || !floaters.length;
@@ -504,6 +521,7 @@
     const k = _bgLast ? Math.min(ts - _bgLast, 100) / 42 : 1;
     _bgLast = ts || 0;
     if (!bgCtx) return;
+    const _t0 = performance.now();
     // Transparent clear: the bioluminescent glow layer sits behind this canvas.
     bgCtx.clearRect(0, 0, bw, bh);
 
@@ -518,6 +536,7 @@
     if (USE_NETWORK) {
       drawNetwork(bgCtx, k);
       if (!reducedMotion) bgT += 42 * k;
+      trackBgCost(_t0);
       return;
     }
 
@@ -538,6 +557,7 @@
     }
 
     if (!reducedMotion) bgT += 42 * k;
+    trackBgCost(_t0);
   }
 
   if (bgCanvas && bgCtx) {
@@ -589,8 +609,7 @@
     const cw = spineWrap.clientWidth || 300;
     const ch = Math.max(graph.clientHeight, graph.offsetHeight, window.innerHeight * 0.72);
 
-    // Sits behind translucent cards at reduced opacity — 1x is plenty.
-    const dpr = 1;
+    const dpr = canvasDpr; // shares the adaptive resolution with the background
     if (cw !== lastSpineW || ch !== lastSpineH) {
       // Only touch styles when the size really changes: writing height every
       // animation frame invalidated style/layout 25 times a second.
@@ -1279,12 +1298,15 @@
     const h = now.getHours();
     const m = now.getMinutes();
     const s = now.getSeconds();
-    const totalSec = h * 3600 + m * 60 + s;
-    const phi = (totalSec / 86400).toFixed(3);
-    const zt = (h + m / 60 + s / 3600).toFixed(1);
+    // Zeitgeber Time: hours since lights-on (ZT0), on a 12:12 light:dark cycle
+    // with lights-on at 06:00 local. ZT0–12 = light phase, ZT12–24 = dark.
+    // φ is circadian phase as a fraction of the cycle, measured from ZT0.
+    const ztHours = (h + m / 60 + s / 3600 - LIGHTS_ON + 24) % 24;
+    const phi = (ztHours / 24).toFixed(3);
+    const zt = ztHours.toFixed(1);
     const pad = (n) => String(n).padStart(2, "0");
     const timeStr = `${pad(h)}:${pad(m)}:${pad(s)}`;
-    const phase = totalSec >= 6 * 3600 && totalSec < 18 * 3600 ? "Light" : "Dark";
+    const phase = ztHours < 12 ? "Light" : "Dark";
 
     // Perf: build the spans once, then only swap their text each tick (the old
     // innerHTML rebuild + offsetWidth read re-parsed and re-laid-out every second).
@@ -1295,12 +1317,14 @@
       bioParts = bioClock.querySelectorAll("span");
     }
     bioParts[0].textContent = `φ = ${phi}`;
-    bioParts[1].textContent = `τ_local = ${timeStr} ${tzLabel}`;
-    bioParts[2].textContent = `ZT+${zt}h`;
+    // (τ is the free-running period in chronobiology, so it isn't used for clock time)
+    bioParts[1].textContent = `local ${timeStr} ${tzLabel}`;
+    bioParts[2].textContent = `ZT${zt}`;
     bioParts[3].textContent = phase;
     bioClock.setAttribute("datetime", now.toISOString());
   }
 
+  const LIGHTS_ON = 6; // ZT0 = 06:00 local, close to sunrise in Bengaluru
   let bioParts = null;
   let tzLabel = "IST";
   try {
@@ -1319,6 +1343,70 @@
   if (document.fonts?.ready) document.fonts.ready.then(sizeFootRule);
   setInterval(updateBioClock, 1000);
   window.addEventListener("resize", sizeFootRule);
+
+  /* ─── Theme: OLED Black ↔ Lab Paper, switched with a cell-spread reveal ───
+     The browser snapshots the old and new page (View Transitions) and we grow
+     the new snapshot out of the switch as a rippling membrane, so background,
+     canvases and cards all change on the same edge. Browsers without the API
+     simply switch instantly. */
+  const root = document.documentElement;
+  const themeBtn = document.querySelector(".theme-toggle");
+  const themeMeta = document.querySelector('meta[name="theme-color"]');
+
+  function labelThemeButton() {
+    if (!themeBtn) return;
+    const light = root.getAttribute("data-theme") === "light";
+    themeBtn.setAttribute("aria-label", light ? "Switch to dark theme" : "Switch to light theme");
+  }
+
+  function setTheme(next) {
+    root.setAttribute("data-theme", next);
+    try { localStorage.setItem("theme", next); } catch (_) {}
+    if (themeMeta) themeMeta.setAttribute("content", next === "light" ? "#f3f6fb" : "#000000");
+    labelThemeButton();
+  }
+
+  // Keyframes for a cell membrane: a ring of points whose radius ripples
+  // while it grows, settling smooth as it covers the page.
+  function membraneFrames(ox, oy, R) {
+    const N = 48, F = 10, frames = [];
+    for (let k = 0; k <= F; k++) {
+      const p = k / F;
+      const rad = R * 1.2 * (1 - Math.pow(1 - p, 3));
+      const amp = 0.085 * (1 - p * 0.75), ph = p * 4.2, pts = [];
+      for (let i = 0; i < N; i++) {
+        const th = (i / N) * Math.PI * 2;
+        const rr = rad * (1 + amp * Math.sin(5 * th + ph) + amp * 0.6 * Math.sin(3 * th - ph * 1.4));
+        pts.push(`${(ox + Math.cos(th) * rr).toFixed(1)}px ${(oy + Math.sin(th) * rr).toFixed(1)}px`);
+      }
+      frames.push({ clipPath: `polygon(${pts.join(",")})`, offset: p });
+    }
+    return frames;
+  }
+
+  if (themeBtn) {
+    labelThemeButton();
+    themeBtn.addEventListener("click", () => {
+      const next = root.getAttribute("data-theme") === "light" ? "dark" : "light";
+      if (!document.startViewTransition || reducedMotion) { setTheme(next); return; }
+      const r = themeBtn.getBoundingClientRect();
+      const ox = r.left + r.width / 2, oy = r.top + r.height / 2;
+      const R = Math.hypot(Math.max(ox, innerWidth - ox), Math.max(oy, innerHeight - oy));
+      // The new snapshot starts fully clipped (CSS reads these), so it can never
+      // flash in whole before the membrane animation takes over.
+      root.style.setProperty("--vt-x", ox + "px");
+      root.style.setProperty("--vt-y", oy + "px");
+      const vt = document.startViewTransition(() => setTheme(next));
+      vt.ready.then(() => {
+        root.animate(membraneFrames(ox, oy, R), {
+          duration: 820,
+          easing: "linear",
+          fill: "both",
+          pseudoElement: "::view-transition-new(root)",
+        });
+      }).catch(() => {});
+    });
+  }
 
   /* ─── Contact Form Handler ─── */
   document.addEventListener("submit", (e) => {

@@ -1872,14 +1872,12 @@ body.detail-open .mol-graph { visibility: hidden !important; }
 }
 @media (prefers-reduced-motion: reduce) { #bio-cursor { display: none; } }
 
-/* Hide default cursor globally but restore pointer for interactive elements */
-body { cursor: none; }
-a, button, input, textarea, label, select { 
-  cursor: none !important; 
-}
+/* Native cursor: the site's biology lives in the layout, not on the pointer.
+   Hand on anything clickable, text cursor in fields. */
+a, button, label, select, .mol-trigger, .mol-node:not(.mol-core), .nav a, .btn-primary, .detail-close, #centri-skip { cursor: pointer; }
+input, textarea { cursor: text; }
 /* Ensure nothing blocks pointer events on interactive elements */
 .mol-trigger, .mol-node, .nav a, .btn-primary, .detail-close, #centri-skip {
-  cursor: none !important;
   pointer-events: auto !important;
 }
 
@@ -3292,4 +3290,205 @@ body { background: var(--bg); }
 @media (prefers-reduced-motion: reduce) {
   .biolum span, .roles .caret { animation: none; }
   .mol-inner, .mol-trigger { transform: none; }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   THEMES — OLED Black (default) and Lab Paper (light).
+   <html data-theme> is set before first paint by an inline script in
+   index.html. Every colour below comes from these tokens.
+   ══════════════════════════════════════════════════════════════════════ */
+:root {
+  color-scheme: dark;
+  --bg: #000000;
+  --text: #f2f4f8;
+  --soft: #c3c8d2;
+  --muted: #8a909c;
+  --line: rgba(255, 255, 255, 0.10);
+  --line-strong: rgba(255, 255, 255, 0.20);
+  --card: #111216;
+  --card-2: #08080a;
+  --header-bg: rgba(0, 0, 0, 0.84);
+  --panel-bg: #0c0d10;
+  --panel-bg-2: #060607;
+  --backdrop: rgba(0, 0, 0, 0.9);
+  --vignette: rgba(0, 0, 0, 0.55);
+  --orange: #ff9f43;
+  --card-shadow: 0 14px 34px -18px rgba(0, 0, 0, 0.9);
+  --name-grad: linear-gradient(180deg, #ffffff 0%, #e2e6ee 55%, #8dffa8 100%);
+  --canvas-filter: none;
+  --surface: linear-gradient(180deg, color-mix(in srgb, var(--card) 84%, transparent), color-mix(in srgb, var(--card-2) 84%, transparent));
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f3f6fb;
+  --text: #0e1729;
+  --soft: #3d4a63;
+  --muted: #66738c;
+  --line: rgba(14, 23, 41, 0.11);
+  --line-strong: rgba(14, 23, 41, 0.2);
+  --card: #ffffff;
+  --card-2: #f8fafd;
+  --header-bg: rgba(243, 246, 251, 0.86);
+  --panel-bg: #ffffff;
+  --panel-bg-2: #f5f7fb;
+  --backdrop: rgba(225, 231, 241, 0.84);
+  --vignette: rgba(222, 230, 242, 0.6);
+  --neon: #0f9d4a;
+  --neon-dim: #0b7f3b;
+  --cyan: #0088a8;
+  --purple: #7a3ee0;
+  --orange: #c4610a;
+  --danger: #d12a5c;
+  --card-shadow: 0 14px 34px -18px rgba(14, 30, 60, 0.28);
+  --name-grad: linear-gradient(180deg, #0e1729 0%, #1d3354 55%, #0f9d4a 100%);
+  /* Decorative canvases are drawn in neon; in daylight they are inked down
+     on the GPU instead of being redrawn in a second palette. */
+  --canvas-filter: brightness(0.58) saturate(1.6);
+}
+
+body { background: var(--bg); color: var(--text); }
+#dna-bg, .dna-spine, #bio-cursor { filter: var(--canvas-filter); }
+:root[data-theme="light"] .biolum { opacity: 0.55; }
+.screen-overlay { background: radial-gradient(ellipse 70% 60% at 50% 40%, transparent 0%, var(--vignette) 100%); }
+
+.top { background: var(--header-bg); }
+.top::after { background: linear-gradient(90deg, transparent 0%, color-mix(in srgb, var(--neon) 55%, transparent) 50%, transparent 100%); }
+@media (max-width: 960px) { .nav { background: var(--panel-bg); } }
+
+[data-detail="experience"], [data-detail="life"] { --acc: var(--orange); }
+.bond-peptide line { stroke: var(--orange) !important; }
+
+/* Cards: slightly see-through at rest … */
+.mol-inner, .mol-trigger { background: var(--surface); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), var(--card-shadow); }
+.shape-porphyrin .mol-inner { background: linear-gradient(180deg, color-mix(in srgb, var(--card) 86%, transparent), color-mix(in srgb, var(--card-2) 86%, transparent)); }
+/* … frosted glass under the mouse (one card at a time, so it stays smooth) */
+@media (hover: hover) and (pointer: fine) {
+  .mol-node:hover .mol-inner,
+  [data-detail]:hover .mol-inner {
+    background: linear-gradient(180deg, color-mix(in srgb, var(--card) 58%, transparent), color-mix(in srgb, var(--card-2) 58%, transparent));
+    -webkit-backdrop-filter: blur(8px) saturate(1.4);
+    backdrop-filter: blur(8px) saturate(1.4);
+  }
+}
+
+.mol-name, .glitch-name { background: var(--name-grad); -webkit-background-clip: text; background-clip: text; }
+.core-headshot {
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--neon) 85%, transparent),
+    0 0 0 7px color-mix(in srgb, var(--neon) 8%, transparent),
+    0 16px 36px -10px color-mix(in srgb, var(--neon) 35%, transparent);
+}
+.formula-reactant { color: var(--cyan); }
+.formula-enzyme { color: var(--orange); }
+.formula-product { color: var(--purple); }
+.formula-rescue, .lightning-glow { color: var(--neon); }
+
+/* Panels */
+.detail-panel { background: linear-gradient(180deg, var(--panel-bg) 0%, var(--panel-bg-2) 100%); }
+.detail-backdrop { background: var(--backdrop); }
+:root[data-theme="light"] .detail-panel { box-shadow: 0 40px 90px -30px rgba(14, 30, 60, 0.35); }
+:root[data-theme="light"] .detail-panel * { text-shadow: none !important; }
+:root[data-theme="light"] .contact-form input,
+:root[data-theme="light"] .contact-form textarea { background: var(--panel-bg-2); color: var(--text); border-color: var(--line-strong); }
+:root[data-theme="light"] .remac-pathway,
+:root[data-theme="light"] .pathway-detail,
+:root[data-theme="light"] .contact-success { background: var(--panel-bg-2); }
+/* Charts drawn in neon get inked down; "instrument screens" (gel, ECG,
+   growth, bell) stay dark like real monitors on a white bench. */
+:root[data-theme="light"] .detail-panel canvas { filter: var(--canvas-filter); }
+:root[data-theme="light"] #sds-canvas,
+:root[data-theme="light"] #growth-canvas,
+:root[data-theme="light"] #eduEcgCanvas,
+:root[data-theme="light"] #bell-canvas { filter: none; background: #0b1220; border-radius: 8px; }
+/* Panel text that was hard-coded near-white for dark backgrounds */
+:root[data-theme="light"] .objective p,
+:root[data-theme="light"] .edu-info-body { color: var(--soft); }
+:root[data-theme="light"] .plasmid-nav a { color: var(--soft); }
+:root[data-theme="light"] .plasmid-caption,
+:root[data-theme="light"] .edu-info-meta,
+:root[data-theme="light"] .edu-comp-heading,
+:root[data-theme="light"] .edu-comp-head,
+:root[data-theme="light"] .contact-form textarea::placeholder,
+:root[data-theme="light"] .contact-form input::placeholder { color: var(--muted); }
+:root[data-theme="light"] .edu-info-box.visible { background: var(--panel-bg-2); }
+/* Colours written inline in the panel templates, remapped for daylight */
+:root[data-theme="light"] #detail-content [style*="color: #39ff14"], :root[data-theme="light"] #detail-content [style*="color:#39ff14"] { color: var(--neon) !important; }
+:root[data-theme="light"] #detail-content [style*="color: #00e5ff"], :root[data-theme="light"] #detail-content [style*="color:#00e5ff"], :root[data-theme="light"] #detail-content [style*="color: rgba(0, 229, 255"] { color: var(--cyan) !important; }
+:root[data-theme="light"] #detail-content [style*="color: #ff9f43"], :root[data-theme="light"] #detail-content [style*="color:#ff9f43"], :root[data-theme="light"] #detail-content [style*="color:#EF9F27"] { color: var(--orange) !important; }
+:root[data-theme="light"] #detail-content [style*="color: #b44dff"], :root[data-theme="light"] #detail-content [style*="color:#b44dff"] { color: var(--purple) !important; }
+:root[data-theme="light"] #detail-content [style*="color:#ff3366"] { color: var(--danger) !important; }
+:root[data-theme="light"] #detail-content [style*="color:rgba(238,242,255"], :root[data-theme="light"] #detail-content [style*="color: #a0a8c0"] { color: var(--muted) !important; }
+:root[data-theme="light"] #detail-content [style*="color: rgba(220,228,255"] { color: var(--soft) !important; }
+
+/* ── Theme switch: circadian dial (ZT6 midday ↔ ZT18 midnight) ── */
+.theme-toggle {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border-radius: 10px;
+  border: 1px solid var(--line-strong);
+  background: color-mix(in srgb, var(--text) 4%, transparent);
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, translate 0.45s var(--ease-out);
+}
+.theme-toggle:hover { background: color-mix(in srgb, var(--text) 9%, transparent); border-color: color-mix(in srgb, var(--neon) 50%, transparent); }
+.theme-toggle:focus-visible { outline: 2px solid var(--neon); outline-offset: 2px; }
+.theme-toggle svg { width: 20px; height: 20px; overflow: visible; }
+.theme-toggle .hand { transform-origin: 12px 12px; transition: transform 0.7s var(--ease-out); }
+:root[data-theme="dark"] .theme-toggle .hand,
+:root:not([data-theme]) .theme-toggle .hand { transform: rotate(180deg); }
+.theme-toggle .tip { transition: fill-opacity 0.4s; }
+:root:not([data-theme="light"]) .theme-toggle .tip { fill-opacity: 0; }
+
+/* Cell-spread reveal: the browser snapshots old and new page; we animate
+   the new one's clip-path (see script.js). Turn off the default crossfade. */
+::view-transition-old(root),
+::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+/* Start the incoming theme fully clipped at the switch, so no frame ever shows
+   it whole before the membrane animation begins (that was the "blink"). */
+::view-transition-new(root) { z-index: 2; clip-path: circle(0px at var(--vt-x, 100%) var(--vt-y, 0px)); }
+
+/* ── Card micro-graphics: one honest data line per section ── */
+.mol-viz { display: block; width: 74%; max-width: 190px; height: 18px; margin: 0.35rem auto 0.1rem; overflow: visible; color: var(--acc); }
+.mol-viz .ax { stroke: var(--line-strong); stroke-width: 1; fill: none; vector-effect: non-scaling-stroke; }
+.mol-viz .gd { stroke: currentColor; stroke-width: 1; fill: none; opacity: 0.45; stroke-dasharray: 2 2; vector-effect: non-scaling-stroke; }
+.mol-viz .ln { stroke: currentColor; stroke-width: 1.3; fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 0; }
+.mol-viz .dt { fill: currentColor; }
+.mol-viz.seq { height: 14px; width: 66%; }
+.mol-viz.seq rect { opacity: 0.85; transform-box: fill-box; transform-origin: bottom; }
+.mol-viz .base-a { fill: var(--neon); }
+.mol-viz .base-c { fill: var(--cyan); }
+.mol-viz .base-g { fill: var(--orange); }
+.mol-viz .base-t { fill: var(--purple); }
+@media (hover: hover) {
+  .mol-node:hover .mol-viz .ln { animation: viz-draw 0.9s var(--ease-out) both; }
+  .mol-node:hover .mol-viz.seq rect { animation: viz-read 0.6s var(--ease-out) both; animation-delay: calc(var(--i) * 18ms); }
+}
+@keyframes viz-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes viz-read { from { transform: scaleY(0.15); opacity: 0.3; } to { transform: none; opacity: 0.85; } }
+/* The micro-graphics add a line to every card: tighten desktop spacing so the
+   one-screen layout still fits at common laptop heights. */
+@media (min-width: 961px) {
+  .mol-inner, .mol-trigger { padding-top: 0.85rem; padding-bottom: 0.85rem; min-height: 0; }
+  .mol-viz { height: 14px; margin: 0.25rem auto 0; }
+  .mol-viz.seq { height: 11px; }
+  .tap-hint, [data-detail] .tap-hint { margin-top: 0.3rem; }
+  .mol-inner h2 { margin-bottom: 0.35rem; }
+  .overview { margin-bottom: 0.2rem; }
+}
+@media (max-height: 860px) and (min-width: 961px) {
+  .mol-viz { height: 11px; margin-top: 0.15rem; }
+  .mol-viz.seq { height: 9px; }
+  .mol-inner, .mol-trigger { padding-top: 0.6rem; padding-bottom: 0.6rem; }
+  .mol-left, .mol-right, .mol-col { gap: 0.45rem; }
+  .overview { font-size: 0.74rem; line-height: 1.45; }
+  .core-headshot { width: 76px; height: 76px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-toggle .hand { transition: none; }
+  .mol-node:hover .mol-viz .ln, .mol-node:hover .mol-viz.seq rect { animation: none; }
 }
