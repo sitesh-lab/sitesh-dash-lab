@@ -65,7 +65,7 @@
       ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2);
       ctx.fillStyle = col;
       ctx.shadowColor = col;
-      ctx.shadowBlur = compactMode ? 5 : (hot ? 22 : 12);
+      ctx.shadowBlur = 0 /* no glow */;
       ctx.fill();
       
       // Specular highlight
@@ -120,7 +120,7 @@
       ctx.lineWidth = active ? 2.6 : 2;
       ctx.strokeStyle = active ? '#fff' : 'rgba(230,240,255,0.85)';
       ctx.shadowColor = 'rgba(255,255,255,0.5)';
-      ctx.shadowBlur = 6;
+      ctx.shadowBlur = 0 /* no glow */;
       ctx.lineCap = 'round';
       ctx.beginPath();
       // N to CA
@@ -383,7 +383,7 @@
       const tw = ctx.measureText(NAME).width, left = cx - tw / 2;
       ctx.save();
       ctx.beginPath(); ctx.rect(left - 6, cy - fs, tw * writeP + 12, fs * 2.6); ctx.clip();
-      ctx.fillStyle = '#39ff14'; ctx.shadowColor = 'rgba(57,255,20,0.55)'; ctx.shadowBlur = 12;
+      ctx.fillStyle = '#39ff14'; ctx.shadowColor = 'rgba(57,255,20,0.55)'; ctx.shadowBlur = 0 /* no glow */;
       ctx.fillText(NAME, cx, cy);
       ctx.restore(); ctx.shadowBlur = 0;
       if (writeP < 1) {   // glowing write-head
@@ -428,7 +428,7 @@
       if (alpha <= 0.01) return;
       ctx.save(); ctx.globalAlpha = alpha; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       ctx.font = '600 ' + Math.min(W * 0.015, 13) + 'px "JetBrains Mono",monospace';
-      ctx.fillStyle = 'rgba(224,240,250,0.9)'; ctx.shadowColor = 'rgba(0,229,255,0.5)'; ctx.shadowBlur = 6;
+      ctx.fillStyle = 'rgba(224,240,250,0.9)'; ctx.shadowColor = 'rgba(0,229,255,0.5)'; ctx.shadowBlur = 0 /* no glow */;
       ctx.fillText(text.toUpperCase(), cx, H * 0.8);
       ctx.restore();
     }
@@ -501,7 +501,7 @@
         ctx.strokeStyle = '#39ff14';
         ctx.lineWidth = 2;
         ctx.shadowColor = '#39ff14';
-        ctx.shadowBlur = 15;
+        ctx.shadowBlur = 0 /* no glow */;
         ctx.globalAlpha = prog;
         ctx.stroke();
 
@@ -545,7 +545,7 @@
           const y = cy + Math.sin(angle) * wordR;
           ctx.fillStyle = WCOLS[i];
           ctx.shadowColor = WCOLS[i];
-          ctx.shadowBlur = 10;
+          ctx.shadowBlur = 0 /* no glow */;
           ctx.globalAlpha = prog * 0.85;
           ctx.fillText(word, x, y);
         });
@@ -570,7 +570,7 @@
           ctx.textBaseline = 'middle';
           ctx.fillStyle = WCOLS[i];
           ctx.shadowColor = WCOLS[i];
-          ctx.shadowBlur = 15 * easedProg;
+          ctx.shadowBlur = 0 /* no glow */;
           ctx.globalAlpha = 1 - easedProg * 0.6;
           ctx.fillText(word, x, y);
         });
@@ -581,7 +581,7 @@
         ctx.arc(cx, cy, coreR, 0, Math.PI * 2);
         ctx.fillStyle = '#39ff14';
         ctx.shadowColor = '#39ff14';
-        ctx.shadowBlur = 30 * easedProg;
+        ctx.shadowBlur = 0 /* no glow */;
         ctx.globalAlpha = easedProg;
         ctx.fill();
         ctx.globalAlpha = 1; ctx.shadowBlur = 0;
@@ -610,7 +610,7 @@
           ctx.arc(p.x, p.y, p.r * p.life, 0, Math.PI * 2);
           ctx.fillStyle = p.col;
           ctx.shadowColor = p.col;
-          ctx.shadowBlur = 8;
+          ctx.shadowBlur = 0 /* no glow */;
           ctx.globalAlpha = p.life;
           ctx.fill();
         }
@@ -629,7 +629,7 @@
         // Main text
         ctx.fillStyle = '#39ff14';
         ctx.shadowColor = '#39ff14';
-        ctx.shadowBlur = 25;
+        ctx.shadowBlur = 0 /* no glow */;
         ctx.globalAlpha = 1;
         ctx.fillText(NAME.slice(0, nameTyped), cx, cy);
 
@@ -648,7 +648,7 @@
           ctx.font = `600 ${Math.min(W * 0.022, 18)}px "JetBrains Mono"`;
           ctx.fillStyle = '#00e5ff';
           ctx.shadowColor = '#00e5ff';
-          ctx.shadowBlur = 12;
+          ctx.shadowBlur = 0 /* no glow */;
           ctx.fillText(SUB.slice(0, subTyped), cx, cy + nameSize * 0.85);
         }
 
@@ -657,7 +657,7 @@
         ctx.fillRect(W * 0.1, H - 40, W * 0.8, 3);
         ctx.fillStyle = '#39ff14';
         ctx.shadowColor = '#39ff14';
-        ctx.shadowBlur = 8;
+        ctx.shadowBlur = 0 /* no glow */;
         ctx.fillRect(W * 0.1, H - 40, W * 0.8 * prog, 3);
 
       } else if (t < PHASE4_END) {
@@ -684,7 +684,7 @@
         ctx.textBaseline = 'middle';
         ctx.fillStyle = '#39ff14';
         ctx.shadowColor = '#39ff14';
-        ctx.shadowBlur = 18;
+        ctx.shadowBlur = 0 /* no glow */;
         ctx.globalAlpha = 1 - prog;
         ctx.fillText(NAME, cx, cy);
         ctx.font = `600 ${Math.min(W * 0.022, 18)}px "JetBrains Mono"`;
@@ -1044,7 +1044,7 @@
 
     function curve(fn, col, prog) {
       ctx.strokeStyle = col; ctx.lineWidth = 2; ctx.shadowColor = col;
-      ctx.shadowBlur = 8; ctx.lineJoin = 'round';
+      ctx.shadowBlur = 0 /* no glow */; ctx.lineJoin = 'round';
       ctx.beginPath();
       const steps = 90;
       for (let i = 0; i <= steps; i++) {
@@ -1053,7 +1053,7 @@
         i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
       }
       ctx.stroke(); ctx.shadowBlur = 0;
-      ctx.fillStyle = col; ctx.shadowColor = col; ctx.shadowBlur = 12;
+      ctx.fillStyle = col; ctx.shadowColor = col; ctx.shadowBlur = 0 /* no glow */;
       ctx.beginPath(); ctx.arc(X(prog), Y(fn(prog)), 3.5, 0, Math.PI * 2); ctx.fill();
       ctx.shadowBlur = 0;
     }
@@ -1187,7 +1187,7 @@
 
       // growth curve
       ctx.strokeStyle = '#ff9f43'; ctx.lineWidth = 2.2; ctx.shadowColor = '#ff9f43';
-      ctx.shadowBlur = 9; ctx.lineJoin = 'round'; ctx.beginPath();
+      ctx.shadowBlur = 0 /* no glow */; ctx.lineJoin = 'round'; ctx.beginPath();
       const steps = 90;
       for (let i = 0; i <= steps; i++) {
         const t = (i / steps) * prog;
@@ -1200,7 +1200,7 @@
       POINTS.forEach((p, i) => {
         if (p.t > prog + 0.001) return;
         const hov = i === hoverIdx;
-        ctx.fillStyle = p.color; ctx.shadowColor = p.color; ctx.shadowBlur = hov ? 18 : 10;
+        ctx.fillStyle = p.color; ctx.shadowColor = p.color; ctx.shadowBlur = 0 /* no glow */;
         ctx.beginPath(); ctx.arc(p._x, p._y, hov ? 6 : 4.5, 0, Math.PI * 2); ctx.fill();
         ctx.shadowBlur = 0;
         ctx.fillStyle = p.color; ctx.globalAlpha = hov ? 1 : 0.8;
@@ -1314,7 +1314,7 @@
           const phase = ((t * 0.0009) + i * 0.13 + k * 0.5) % 1;
           const px = a._x + (b._x - a._x) * phase, py = a._y + (b._y - a._y) * phase;
           ctx.fillStyle = hl ? '#ffffff' : hexA(b.color, 0.85);
-          ctx.shadowColor = b.color; ctx.shadowBlur = hl ? 12 : 7;
+          ctx.shadowColor = b.color; ctx.shadowBlur = 0 /* no glow */;
           ctx.beginPath(); ctx.arc(px, py, hl ? 2.8 : 2, 0, Math.PI * 2); ctx.fill();
           ctx.shadowBlur = 0;
         }
@@ -1329,7 +1329,7 @@
         }
         ctx.fillStyle = 'rgba(5,10,18,0.92)';
         ctx.strokeStyle = n.color; ctx.lineWidth = hov ? 2.6 : 1.8;
-        ctx.shadowColor = n.color; ctx.shadowBlur = hov ? 22 : (central ? 16 : 10);
+        ctx.shadowColor = n.color; ctx.shadowBlur = 0 /* no glow */;
         ctx.beginPath(); ctx.arc(n._x, n._y, br, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
         ctx.shadowBlur = 0;
         ctx.fillStyle = hexA(n.color, 0.45 + 0.35 * pulse); // glowing core dot
@@ -1452,7 +1452,7 @@
         if (a <= 0) return;
         const hov = i === hoverIdx;
         ctx.globalAlpha = a;
-        ctx.fillStyle = p.color; ctx.shadowColor = p.color; ctx.shadowBlur = hov ? 16 : 8;
+        ctx.fillStyle = p.color; ctx.shadowColor = p.color; ctx.shadowBlur = 0 /* no glow */;
         ctx.beginPath(); ctx.arc(p._x, p._y, hov ? 6 : 4.2, 0, Math.PI * 2); ctx.fill();
         ctx.shadowBlur = 0; ctx.globalAlpha = 1;
       });
@@ -1660,7 +1660,7 @@
 
         ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
         ctx.fillStyle = finished ? '#39ff14' : step.col;
-        ctx.shadowColor = finished ? '#39ff14' : step.col; ctx.shadowBlur = 18;
+        ctx.shadowColor = finished ? '#39ff14' : step.col; ctx.shadowBlur = 0 /* no glow */;
         ctx.font = '800 ' + Math.max(22, W * 0.085) + 'px "Syne",system-ui,sans-serif';
         ctx.fillText(finished ? '✓ AMPLIFIED' : (step.temp + '°C'), W / 2, H / 2 - 12);
         ctx.shadowBlur = 0;
@@ -1771,7 +1771,7 @@
         ctx.fillText(mw + ' kDa', LANE_W - 5, y + 3);
         // Ladder band
         ctx.fillStyle = 'rgba(160,170,255,0.4)';
-        ctx.shadowColor = '#6060ff'; ctx.shadowBlur = 6;
+        ctx.shadowColor = '#6060ff'; ctx.shadowBlur = 0 /* no glow */;
         ctx.fillRect(4, y - 2.5, LANE_W * 0.72, 4.5);
         // Guide line across
         ctx.setLineDash([2, 6]);
@@ -1807,7 +1807,7 @@
           ctx.globalAlpha = p * 0.92;
           ctx.fillStyle   = lane.col;
           ctx.shadowColor = lane.col;
-          ctx.shadowBlur  = 14 * p;
+          ctx.shadowBlur  = 0 /* no glow */;
           ctx.fillRect(lx + 5, y - 3, LANE_W - 10, 5.5);
           ctx.restore();
 
@@ -1817,7 +1817,7 @@
             ctx.globalAlpha = ta;
             ctx.fillStyle   = '#ffffff';
             ctx.shadowColor = lane.col;
-            ctx.shadowBlur  = 5;
+            ctx.shadowBlur  = 0 /* no glow */;
             ctx.font = `7.5px "JetBrains Mono",monospace`;
             ctx.textAlign   = 'center';
             ctx.fillText(band.name, lx + LANE_W / 2, y + 1.5);
@@ -1950,7 +1950,7 @@
         const w = step * 0.85, sig = w * 0.34;
 
         ctx.strokeStyle = col; ctx.lineWidth = m ? 2.4 : 1.5; ctx.globalAlpha = m ? 1 : 0.8;
-        ctx.shadowColor = col; ctx.shadowBlur = m ? 12 : 4;
+        ctx.shadowColor = col; ctx.shadowBlur = 0 /* no glow */;
         ctx.beginPath();
         let first = true;
         for (let dx = -w; dx <= w; dx += 1.4) {
@@ -1971,7 +1971,7 @@
           ctx.setLineDash([]); ctx.globalAlpha = 1;
           const lx = Math.max(34, Math.min(W - 34, x));
           ctx.fillStyle = col; ctx.font = 'bold ' + Math.max(8, W * 0.0125) + 'px "JetBrains Mono",monospace';
-          ctx.textAlign = 'center'; ctx.shadowColor = col; ctx.shadowBlur = hov ? 10 : 0;
+          ctx.textAlign = 'center'; ctx.shadowColor = col; ctx.shadowBlur = 0 /* no glow */;
           ctx.fillText(m.label, lx, 16);
           ctx.shadowBlur = 0;
           ctx.strokeStyle = hexA(col, 0.4); ctx.lineWidth = 1;
@@ -1980,7 +1980,7 @@
       }
 
       if (prog < 1) {
-        ctx.strokeStyle = 'rgba(0,229,255,0.55)'; ctx.lineWidth = 1.5; ctx.shadowColor = '#00e5ff'; ctx.shadowBlur = 8;
+        ctx.strokeStyle = 'rgba(0,229,255,0.55)'; ctx.lineWidth = 1.5; ctx.shadowColor = '#00e5ff'; ctx.shadowBlur = 0 /* no glow */;
         ctx.beginPath(); ctx.moveTo(revealX, PAD.t - 8); ctx.lineTo(revealX, baseY); ctx.stroke(); ctx.shadowBlur = 0;
       }
 
@@ -2113,7 +2113,7 @@
             ctx.strokeStyle = 'rgba(130,200,255,' + (0.16 * k) + ')'; ctx.lineWidth = 1;
             ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
             const ph = ((t * 0.5) + (i * 3 + j) * 0.17) % 1;
-            ctx.fillStyle = a.col; ctx.globalAlpha = 0.5 * k; ctx.shadowColor = a.col; ctx.shadowBlur = 6;
+            ctx.fillStyle = a.col; ctx.globalAlpha = 0.5 * k; ctx.shadowColor = a.col; ctx.shadowBlur = 0 /* no glow */;
             ctx.beginPath(); ctx.arc(a.x + (b.x - a.x) * ph, a.y + (b.y - a.y) * ph, 1.8, 0, 6.283); ctx.fill();
             ctx.globalAlpha = 1; ctx.shadowBlur = 0;
           }
@@ -2124,7 +2124,7 @@
       for (let i = sparks.length - 1; i >= 0; i--) {
         const s = sparks[i]; s.x += s.vx; s.y += s.vy; s.life -= 0.012;
         if (s.life <= 0) { sparks.splice(i, 1); continue; }
-        ctx.fillStyle = s.col; ctx.globalAlpha = s.life * 0.8; ctx.shadowColor = s.col; ctx.shadowBlur = 6;
+        ctx.fillStyle = s.col; ctx.globalAlpha = s.life * 0.8; ctx.shadowColor = s.col; ctx.shadowBlur = 0 /* no glow */;
         ctx.beginPath(); ctx.arc(s.x, s.y, 1.4 + s.life * 1.6, 0, 6.283); ctx.fill();
       }
       ctx.globalAlpha = 1; ctx.shadowBlur = 0;
@@ -2138,7 +2138,7 @@
         const pulse = 0.72 + 0.28 * Math.sin(t * 1.6 + m.ph), fl = Math.max(0, m.flash), rr = m.r * (1 + fl * 0.25);
         ctx.save(); ctx.translate(m.x, m.y); ctx.rotate(m.rot);
         ctx.strokeStyle = m.col; ctx.fillStyle = m.col; ctx.globalAlpha = Math.min(1, 0.64 * pulse + fl * 0.5);
-        ctx.lineWidth = 1.8; ctx.shadowColor = m.col; ctx.shadowBlur = 9 + fl * 20;
+        ctx.lineWidth = 1.8; ctx.shadowColor = m.col; ctx.shadowBlur = 0 /* no glow */;
         if (m.kind === 0) {          // hexagon ring
           ctx.beginPath(); for (let k = 0; k < 6; k++) { const an = k / 6 * 6.283; k ? ctx.lineTo(Math.cos(an) * rr, Math.sin(an) * rr) : ctx.moveTo(Math.cos(an) * rr, Math.sin(an) * rr); } ctx.closePath(); ctx.stroke();
         } else if (m.kind === 1) {   // ring + orbiting atom
@@ -2659,7 +2659,7 @@
         ctx.arc(p.x, p.y, 2.5, 0, Math.PI*2);
         ctx.fillStyle = `rgba(180, 77, 255, ${p.life})`;
         ctx.shadowColor = '#b44dff';
-        ctx.shadowBlur = 10 * p.life;
+        ctx.shadowBlur = 0 /* no glow */;
         ctx.fill();
       }
       ctx.shadowBlur = 0;

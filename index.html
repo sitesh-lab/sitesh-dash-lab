@@ -899,7 +899,7 @@
         ctx.lineJoin    = 'round';
         ctx.lineCap     = 'round';
         ctx.shadowColor = col;
-        ctx.shadowBlur  = 10;
+        ctx.shadowBlur  = 0 /* no glow */;
         ctx.beginPath();
         ctx.moveTo(pts[i].x, pts[i].y);
         ctx.lineTo(pts[i+1].x, pts[i+1].y);
@@ -915,7 +915,7 @@
         ctx.lineJoin    = 'round';
         ctx.lineCap     = 'round';
         ctx.shadowColor = col;
-        ctx.shadowBlur  = 10;
+        ctx.shadowBlur  = 0 /* no glow */;
         ctx.beginPath();
         ctx.moveTo(pts[di].x, pts[di].y);
         ctx.lineTo(end.x, end.y);
@@ -924,7 +924,7 @@
 
         // Moving glow dot
         ctx.save();
-        ctx.fillStyle  = col; ctx.shadowColor = col; ctx.shadowBlur = 20;
+        ctx.fillStyle  = col; ctx.shadowColor = col; ctx.shadowBlur = 0 /* no glow */;
         ctx.beginPath(); ctx.arc(end.x, end.y, 5, 0, Math.PI*2); ctx.fill();
         ctx.restore();
       }
@@ -942,7 +942,7 @@
         // Peak dot
         ctx.save();
         ctx.fillStyle   = col; ctx.shadowColor = col;
-        ctx.shadowBlur  = isHov ? 22 : 14;
+        ctx.shadowBlur  = 0 /* no glow */;
         ctx.globalAlpha = isHov ? 1 : 0.9;
         ctx.beginPath(); ctx.arc(m._cx, m._base - m._sh, isHov ? 6.5 : 5, 0, Math.PI*2); ctx.fill();
         ctx.restore();
@@ -953,7 +953,7 @@
         ctx.font        = `${isHov ? 700 : 600} ${fsz}px "JetBrains Mono",monospace`;
         ctx.fillStyle   = col;
         ctx.shadowColor = col;
-        ctx.shadowBlur  = isHov ? 18 : 11; /* uniform glow for every milestone */
+        ctx.shadowBlur  = 0 /* no glow */; /* uniform glow for every milestone */
         const topY = m._base - m._sh - (isHov ? 26 : 24);
         ctx.fillText(m.label, m._cx, topY);
         ctx.restore();
@@ -990,7 +990,7 @@
         if (cursorOn) {
           const lastCol = MILESTONES[MILESTONES.length-1].color;
           ctx.save();
-          ctx.fillStyle = lastCol; ctx.shadowColor = lastCol; ctx.shadowBlur = 20;
+          ctx.fillStyle = lastCol; ctx.shadowColor = lastCol; ctx.shadowBlur = 0 /* no glow */;
           ctx.beginPath(); ctx.arc(pts[pts.length-1].x + 8, BASE, 4, 0, Math.PI*2); ctx.fill();
           ctx.restore();
         }
