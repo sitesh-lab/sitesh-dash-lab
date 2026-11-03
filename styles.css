@@ -2645,6 +2645,7 @@ input, textarea { cursor: text; }
 .detail-panel.custom-anim {
   opacity: 0;
   transition: none;
+  transform: none; /* no leftover 94% scale to snap from when the reveal starts */
 }
 
 /* ══════════════════════════════════════════════════════════════════════
@@ -3385,6 +3386,10 @@ body { background: var(--bg); color: var(--text); }
 
 /* Panels */
 .detail-panel { background: linear-gradient(180deg, var(--panel-bg) 0%, var(--panel-bg-2) 100%); }
+/* Anchor panels to the top: when their charts finish loading and the content
+   grows, a centred panel re-centred and jumped upward. Now it grows down. */
+.detail-screen { align-items: flex-start; padding-top: max(1rem, 6vh); }
+@media (max-width: 600px) { .detail-screen { padding-top: max(0.5rem, 4vh); } }
 .detail-backdrop { background: var(--backdrop); }
 :root[data-theme="light"] .detail-panel { box-shadow: 0 40px 90px -30px rgba(14, 30, 60, 0.35); }
 :root[data-theme="light"] .detail-panel * { text-shadow: none !important; }
@@ -3393,13 +3398,16 @@ body { background: var(--bg); color: var(--text); }
 :root[data-theme="light"] .remac-pathway,
 :root[data-theme="light"] .pathway-detail,
 :root[data-theme="light"] .contact-success { background: var(--panel-bg-2); }
-/* Charts drawn in neon get inked down; "instrument screens" (gel, ECG,
-   growth, bell) stay dark like real monitors on a white bench. */
-:root[data-theme="light"] .detail-panel canvas { filter: var(--canvas-filter); }
-:root[data-theme="light"] #sds-canvas,
-:root[data-theme="light"] #growth-canvas,
-:root[data-theme="light"] #eduEcgCanvas,
-:root[data-theme="light"] #bell-canvas { filter: none; background: #0b1220; border-radius: 8px; }
+/* Panel charts and the Remac-PET pathway diagram are drawn for a dark
+   background (many paint their own dark fill). In daylight they are inverted
+   and the hue turned back 180°: dark grounds become light, white labels
+   become ink, and each neon line becomes a deeper shade of the same colour.
+   One GPU filter per chart; nothing is redrawn. */
+:root[data-theme="light"] .detail-panel canvas,
+:root[data-theme="light"] .remac-pathway svg { filter: invert(1) hue-rotate(180deg); }
+/* The genome map draws its own Lab Paper palette (inverting turned its
+   purples and pinks pale) */
+:root[data-theme="light"] #plasmid-canvas { filter: none; }
 /* Panel text that was hard-coded near-white for dark backgrounds */
 :root[data-theme="light"] .objective p,
 :root[data-theme="light"] .edu-info-body { color: var(--soft); }

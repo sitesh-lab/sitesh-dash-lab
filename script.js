@@ -935,12 +935,15 @@
     const w = panel.offsetWidth, h = panel.offsetHeight;
     const rad = Math.hypot(Math.max(Math.abs(origin.x), Math.abs(w - origin.x)), Math.max(Math.abs(origin.y), Math.abs(h - origin.y)));
     const at = `at ${origin.x.toFixed(0)}px ${origin.y.toFixed(0)}px`;
+    // Clip-path only. Scaling the panel at the same time re-rasterised all of
+    // its text at a slightly different size every frame, which read as the
+    // content "vibrating"; with no transform the text stays pixel-still.
     panel.animate(
       [
-        { clipPath: `circle(0px ${at})`, transform: "scale(0.97)" },
-        { clipPath: `circle(${rad.toFixed(0)}px ${at})`, transform: "scale(1)" },
+        { clipPath: `circle(0px ${at})` },
+        { clipPath: `circle(${rad.toFixed(0)}px ${at})` },
       ],
-      { duration: 620, easing: "cubic-bezier(0.2, 0.8, 0.2, 1)" }
+      { duration: 560, easing: "cubic-bezier(0.2, 0.8, 0.2, 1)" }
     );
   }
 

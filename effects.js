@@ -757,28 +757,34 @@
     const ctx = canvas.getContext('2d');
     const tip = document.getElementById('plasmid-tip');
 
+    // pSKD: the site drawn as a plasmid map of its own expression construct
+    // (EF1α → Igκ leader → FAST-PETase N233K → LAMP1 tail) on a standard
+    // backbone. Features run clockwise from 12 o'clock in 5′→3′ order; `w` is
+    // the relative feature length, `dir` the strand (1 = forward, -1 = reverse,
+    // 0 = no direction). Each feature opens the section it stands for.
     const FEATURES = [
-      { id: 'research',   label: 'Remac-PET',    sub: 'Bioremediation · PETase N233K',  color: '#39ff14' },
-      { id: 'about',      label: 'Profile',      sub: 'GDP/ALCOA++ · facilitation',     color: '#00e5ff' },
-      { id: 'experience', label: 'Experience',   sub: 'ParSEC · PU graduate research',  color: '#ff9f43' },
-      { id: 'education',  label: 'Education',     sub: 'M.Sc. Biochem · B.Sc.',          color: '#1D9E75' },
-      { id: 'skills',     label: 'Skills',       sub: 'PCR · PyMOL · BLAST · GDP',       color: '#b44dff' },
-      { id: 'achieve',    label: 'Awards',       sub: 'CSIR JRF · AIR 153',             color: '#ff3366' },
-      { id: 'ambition',   label: 'Ambition',     sub: 'Ashram-hospitals · living labs', color: '#b44dff' },
-      { id: 'life',       label: 'Beyond Bench', sub: 'Athletics · narrative science',  color: '#ff9f43' },
-      { id: 'contact',    label: 'Contact',      sub: 'Catalyze synergy',               color: '#00e5ff' },
+      { id: 'ambition',   label: 'Ambition',     part: 'CMV enhancer',      region: 'upstream',   role: 'amplifies what follows',            sub: 'Ashram-hospitals · living labs', color: '#b44dff', w: 0.9, dir: 0 },
+      { id: 'about',      label: 'Profile',      part: 'EF1α promoter',     region: 'upstream',   role: 'drives everything downstream',      sub: 'GDP/ALCOA++ · facilitation',     color: '#00e5ff', w: 1.0, dir: 1 },
+      { id: 'experience', label: 'Experience',   part: 'Igκ leader',        region: 'coding',     role: 'signal peptide: directs the output', sub: 'ParSEC · PU graduate research',  color: '#ff9f43', w: 0.55, dir: 1 },
+      { id: 'research',   label: 'Remac-PET',    part: 'FAST-PETase N233K', region: 'coding',     role: 'the coding sequence',                sub: 'Bioremediation · PETase N233K',  color: '#39ff14', w: 2.3, dir: 1 },
+      { id: 'skills',     label: 'Skills',       part: 'LAMP1 tail',        region: 'coding',     role: 'sorting signal: precise targeting',  sub: 'PCR · PyMOL · BLAST · GDP',      color: '#b44dff', w: 0.6, dir: 1 },
+      { id: 'life',       label: 'Beyond Bench', part: 'bGH poly(A)',       region: 'downstream', role: 'stability beyond the coding region', sub: 'Athletics · narrative science',  color: '#ff9f43', w: 0.65, dir: 0 },
+      { id: 'education',  label: 'Education',    part: 'pUC ori',           region: 'backbone',   role: 'where replication starts',           sub: 'M.Sc. Biochem · B.Sc.',          color: '#1D9E75', w: 1.1, dir: 0 },
+      { id: 'achieve',    label: 'Awards',       part: 'AmpR',              region: 'backbone',   role: 'selection marker: chosen under pressure', sub: 'CSIR JRF · AIR 153',        color: '#ff3366', w: 1.5, dir: -1 },
+      { id: 'contact',    label: 'Contact',      part: 'M13 fwd primer',    region: 'backbone',   role: 'binding site: where collaboration starts', sub: 'Catalyze synergy',         color: '#00e5ff', w: 0.5, dir: 0 },
     ];
 
     let W, H, cx, cy, R, ringW, raf = null, rot = -Math.PI / 2, hoverIdx = -1;
     let arcs = [];
-    const GAP = 0.05;
+    const GAP = 0.035;
 
     function computeArcs() {
-      const n = FEATURES.length;
-      const seg = (Math.PI * 2) / n;
-      arcs = FEATURES.map((f, i) => {
-        const start = -Math.PI / 2 + i * seg + GAP / 2;
-        const end   = -Math.PI / 2 + (i + 1) * seg - GAP / 2;
+      const total = FEATURES.reduce((s, f) => s + f.w, 0);
+      let a = -Math.PI / 2;
+      arcs = FEATURES.map((f) => {
+        const span = (f.w / total) * Math.PI * 2;
+        const start = a + GAP / 2, end = a + span - GAP / 2;
+        a += span;
         return Object.assign({}, f, { start, end, mid: (start + end) / 2 });
       });
     }
@@ -799,17 +805,23 @@
       computeArcs();
     }
 
+    // Lab Paper versions of the neon feature colours + ink for text
+    const LIGHT_COL = { '#39ff14': '#0f9d4a', '#00e5ff': '#0088a8', '#b44dff': '#7a3ee0', '#ff9f43': '#c4610a', '#ff3366': '#d12a5c', '#1D9E75': '#11805c' };
+
     function draw() {
+      const light = document.documentElement.getAttribute('data-theme') === 'light';
+      const col = (c) => (light ? LIGHT_COL[c] || c : c);
+      const ink = light ? (a) => 'rgba(14,23,41,' + a + ')' : (a) => 'rgba(220,228,245,' + a + ')';
       ctx.clearRect(0, 0, W, H);
 
       // Backbone double-ring
       ctx.lineWidth = 1;
-      ctx.strokeStyle = 'rgba(150,170,230,0.12)';
+      ctx.strokeStyle = ink(0.12);
       ctx.beginPath(); ctx.arc(cx, cy, R + ringW * 0.5 + 3, 0, Math.PI * 2); ctx.stroke();
       ctx.beginPath(); ctx.arc(cx, cy, R - ringW * 0.5 - 3, 0, Math.PI * 2); ctx.stroke();
 
       // Restriction-site ticks
-      ctx.strokeStyle = 'rgba(180,200,255,0.12)';
+      ctx.strokeStyle = ink(0.14);
       for (let i = 0; i < 60; i++) {
         const a = (i / 60) * Math.PI * 2;
         const r1 = R + ringW * 0.5 + 3, r2 = r1 + (i % 5 === 0 ? 6 : 3);
@@ -819,54 +831,91 @@
         ctx.stroke();
       }
 
-      // Feature arcs + labels
+      // Continuous backbone strand under the features
+      ctx.strokeStyle = ink(0.28);
+      ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.stroke();
+
+      const pt = (a, r) => [cx + Math.cos(a) * r, cy + Math.sin(a) * r];
+      const small = Math.max(7, W * 0.0135);
+
+      // Feature arcs: directional parts end in an arrowhead (AmpR points
+      // backwards: it sits on the reverse strand, as on real maps)
       arcs.forEach((arc, i) => {
         const hov = i === hoverIdx;
+        const w = hov ? ringW * 1.25 : ringW;
+        const head = arc.dir ? Math.min(0.09, (arc.end - arc.start) * 0.35) : 0;
+        const a0 = arc.dir < 0 ? arc.start + head : arc.start;
+        const a1 = arc.dir > 0 ? arc.end - head : arc.end;
+        ctx.globalAlpha = hov ? 1 : 0.85;
         ctx.lineCap = 'butt';
-        ctx.lineWidth = hov ? ringW * 1.3 : ringW;
-        ctx.strokeStyle = arc.color;
-        ctx.globalAlpha = hov ? 1 : 0.82;
-        ctx.beginPath();
-        ctx.arc(cx, cy, R, arc.start, arc.end);
-        ctx.stroke();
+        ctx.lineWidth = w;
+        ctx.strokeStyle = col(arc.color);
+        ctx.beginPath(); ctx.arc(cx, cy, R, a0, a1); ctx.stroke();
+        if (arc.dir) {
+          const base = arc.dir > 0 ? a1 : a0, tipA = arc.dir > 0 ? arc.end : arc.start;
+          const o = pt(base, R + w * 0.75), n = pt(base, R - w * 0.75), t = pt(tipA, R);
+          ctx.fillStyle = col(arc.color);
+          ctx.beginPath(); ctx.moveTo(o[0], o[1]); ctx.lineTo(t[0], t[1]); ctx.lineTo(n[0], n[1]); ctx.closePath(); ctx.fill();
+        }
         ctx.globalAlpha = 1;
 
-        // Tick + label outward
+        // Leader line + two-line label: section, then the genetic part
         const baseR = R + ringW * 0.5;
         const lr = baseR + (hov ? 15 : 11);
-        const lx = cx + Math.cos(arc.mid) * lr;
-        const ly = cy + Math.sin(arc.mid) * lr;
-        ctx.strokeStyle = arc.color; ctx.globalAlpha = hov ? 0.9 : 0.45; ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(cx + Math.cos(arc.mid) * baseR, cy + Math.sin(arc.mid) * baseR);
-        ctx.lineTo(lx, ly); ctx.stroke();
+        const [lx, ly] = pt(arc.mid, lr);
+        const [bx, by] = pt(arc.mid, baseR);
+        ctx.strokeStyle = col(arc.color); ctx.globalAlpha = hov ? 0.9 : 0.45; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(lx, ly); ctx.stroke();
         ctx.globalAlpha = 1;
-
         const right = Math.cos(arc.mid) >= -0.01;
-        ctx.font = (hov ? 700 : 600) + ' ' + Math.max(8.5, W * 0.02) + 'px "JetBrains Mono",monospace';
         ctx.textAlign = right ? 'left' : 'right';
         ctx.textBaseline = 'middle';
-        ctx.fillStyle = arc.color;
-        ctx.fillText(arc.label, lx + (right ? 4 : -4), ly);
+        ctx.font = (hov ? 700 : 600) + ' ' + Math.max(8.5, W * 0.019) + 'px "JetBrains Mono",monospace';
+        ctx.fillStyle = col(arc.color);
+        ctx.fillText(arc.label, lx + (right ? 4 : -4), ly - small * 0.6);
+        ctx.font = '500 ' + small + 'px "JetBrains Mono",monospace';
+        ctx.fillStyle = ink(0.62);
+        ctx.fillText(arc.part, lx + (right ? 4 : -4), ly + small * 0.75);
       });
 
-      // Read-head sweep (a quiet hairline, no glow)
-      ctx.strokeStyle = 'rgba(160,190,220,0.35)';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(cx, cy);
-      ctx.lineTo(cx + Math.cos(rot) * (R - ringW * 0.5 - 4), cy + Math.sin(rot) * (R - ringW * 0.5 - 4));
-      ctx.stroke();
+      // Inner track: the expression cassette (5′ upstream → 3′ downstream)
+      // and the backbone, the way regions are bracketed on a plasmid map
+      const trackR = R - ringW * 0.5 - 9;
+      const cas = arcs.filter((a) => a.region !== 'backbone');
+      const bb = arcs.filter((a) => a.region === 'backbone');
+      ctx.lineWidth = 1.2;
+      ctx.strokeStyle = ink(0.45);
+      ctx.beginPath(); ctx.arc(cx, cy, trackR, cas[0].start, cas[cas.length - 1].end); ctx.stroke();
+      const ce = cas[cas.length - 1].end, h1 = pt(ce, trackR), h2 = pt(ce - 0.07, trackR + 4), h3 = pt(ce - 0.07, trackR - 4);
+      ctx.beginPath(); ctx.moveTo(h2[0], h2[1]); ctx.lineTo(h1[0], h1[1]); ctx.lineTo(h3[0], h3[1]); ctx.stroke();
+      ctx.strokeStyle = ink(0.25);
+      ctx.setLineDash([2, 3]);
+      ctx.beginPath(); ctx.arc(cx, cy, trackR, bb[0].start, bb[bb.length - 1].end); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.font = '500 ' + small + 'px "JetBrains Mono",monospace';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = ink(0.62);
+      const lab = (a, r, text) => { const [x, y] = pt(a, r); ctx.fillText(text, x, y); };
+      lab(cas[0].start + 0.16, trackR - small * 1.6, "5′ upstream");
+      lab(ce - 0.18, trackR - small * 1.6, "3′ downstream");
+      lab((bb[0].start + bb[bb.length - 1].end) / 2, trackR - small * 1.6, 'backbone');
 
-      // Hub: a plain plasmid-map label (map name + feature count), no monogram
-      const light = document.documentElement.getAttribute('data-theme') === 'light';
+      // Read-head sweep: a quiet hairline that stays clear of the hub text
+      ctx.strokeStyle = ink(0.3);
+      ctx.lineWidth = 1;
+      const s0 = pt(rot, R * 0.42), s1 = pt(rot, trackR - 3);
+      ctx.beginPath(); ctx.moveTo(s0[0], s0[1]); ctx.lineTo(s1[0], s1[1]); ctx.stroke();
+
+      // Hub: plasmid name, map type, feature count. No glow.
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.fillStyle = light ? 'rgba(14,23,41,0.75)' : 'rgba(200,210,230,0.6)';
-      ctx.font = '600 ' + Math.max(7, W * 0.015) + 'px "JetBrains Mono",monospace';
-      ctx.fillText('GENOME MAP', cx, cy - 8);
-      ctx.fillStyle = light ? '#0e1729' : 'rgba(235,240,250,0.9)';
-      ctx.font = '600 ' + Math.max(10, W * 0.028) + 'px "JetBrains Mono",monospace';
-      ctx.fillText(arcs.length + ' sections', cx, cy + 8);
+      ctx.fillStyle = ink(0.95);
+      ctx.font = '700 ' + Math.max(13, W * 0.034) + 'px "Syne",system-ui,sans-serif';
+      ctx.fillText('pSKD', cx, cy - 11);
+      ctx.fillStyle = ink(0.6);
+      ctx.font = '600 ' + small + 'px "JetBrains Mono",monospace';
+      ctx.fillText('GENOME MAP', cx, cy + 6);
+      ctx.fillText(arcs.length + ' sections', cx, cy + 6 + small * 1.5);
     }
 
     function hit(clientX, clientY) {
@@ -895,11 +944,13 @@
       if (idx !== hoverIdx) { hoverIdx = idx; if (REDUCED) draw(); }
       if (idx >= 0 && tip) {
         const r = canvas.getBoundingClientRect();
-        tip.textContent = arcs[idx].label + ' — ' + arcs[idx].sub;
+        const f = arcs[idx];
+        tip.textContent = f.label + ' — ' + f.part + ' (' + f.region + '): ' + f.role + ' · ' + f.sub;
         tip.style.left = (e.clientX - r.left) + 'px';
         tip.style.top  = (e.clientY - r.top - 34) + 'px';
-        tip.style.borderColor = arcs[idx].color;
-        tip.style.color = arcs[idx].color;
+        const tc = document.documentElement.getAttribute('data-theme') === 'light' ? (LIGHT_COL[f.color] || f.color) : f.color;
+        tip.style.borderColor = tc;
+        tip.style.color = tc;
         tip.classList.add('visible');
         canvas.style.cursor = 'pointer';
       } else if (tip) {
