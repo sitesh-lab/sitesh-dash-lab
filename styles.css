@@ -388,6 +388,10 @@ body {
   }
 }
 
+/* Wide-screen sizing lives at the END of this file on purpose — see the block
+   after the last media query. A media query adds no specificity, so placing it
+   here let the plain .mol-center and .mol-core rules further down win. */
+
 .dna-spine {
   position: absolute;
   top: 0;
@@ -3550,4 +3554,39 @@ body { background: var(--bg); color: var(--text); }
 @media (prefers-reduced-motion: reduce) {
   .theme-toggle .hand { transition: none; }
   .mol-node:hover .mol-viz .ln, .mol-node:hover .mol-viz.seq rect { animation: none; }
+}
+
+/* ─── Wide screens ────────────────────────────────────────────────────────
+   Must stay LAST in this file. A media query carries no extra specificity,
+   so the plain .mol-center / .mol-core / .mol-node rules above would beat
+   these on source order from anywhere earlier.
+
+   On a 1080p-or-wider monitor the grid stopped at 1280px and every side card
+   at 290px, so a 1920px screen showed ~640px of empty desk and cards that
+   read small at normal sitting distance. Wider cards also wrap less, so they
+   get shorter — the one-screen layout gains vertical room, not loses it.
+   Contact also sat 24px under the profile card and read as one block with it.
+─────────────────────────────────────────────────────────────────────────── */
+@media (min-width: 1500px) {
+  .mol-graph { width: min(100% - 4rem, 1560px); }
+
+  .mol-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(380px, 620px) minmax(0, 1fr);
+  }
+
+  .mol-col.mol-left .mol-node,
+  .mol-col.mol-right .mol-node { max-width: 350px; }
+
+  .mol-core { max-width: min(560px, 96vw); }
+
+  .mol-col.mol-center { gap: clamp(1.8rem, 4.4vh, 3.2rem); }
+
+  /* Wider cards wrap less and so sit shorter; without this the column
+     bunched at the top and left a dead band along the bottom. */
+  .mol-col.mol-left,
+  .mol-col.mol-right { gap: clamp(1.1rem, 2.8vh, 2.1rem); }
+}
+
+@media (min-width: 961px) and (max-width: 1499px) {
+  .mol-col.mol-center { gap: clamp(0.9rem, 2.4vh, 1.8rem); }
 }
