@@ -3590,3 +3590,60 @@ body { background: var(--bg); color: var(--text); }
 @media (min-width: 961px) and (max-width: 1499px) {
   .mol-col.mol-center { gap: clamp(0.9rem, 2.4vh, 1.8rem); }
 }
+
+/* ─── Touch screens ───────────────────────────────────────────────────────
+   Sitesh, 04 Nov 2026: on the demo-space touch screen a finger drag did not
+   scroll — it selected the whole page instead. Three causes, all here:
+
+   1. This stylesheet had no user-select rule anywhere, so a drag selected
+      text. A kiosk browser that reports touch as mouse never gets the
+      long-press-to-select behaviour a phone would, so every scroll attempt
+      highlighted the page.
+   2. .detail-panel scrolls (overflow-y:auto) but its scrollbar is hidden
+      (width:0), so on a touch screen there was no handle and no hint that
+      there was anything below the fold.
+   3. No touch-action, so the browser had to wait and guess on every drag.
+
+   Selection is given back on a fine pointer, where dragging to select is
+   deliberate and copying an email address is useful.
+─────────────────────────────────────────────────────────────────────────── */
+body {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
+.detail-panel {
+  touch-action: pan-y;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* A touch screen needs to SEE that the panel has more below. */
+@media (pointer: coarse) {
+  .detail-panel::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+    display: block;
+  }
+  .detail-panel::-webkit-scrollbar-thumb {
+    background: rgba(91, 232, 176, 0.55);
+    border-radius: 99px;
+  }
+  .detail-panel::-webkit-scrollbar-track { background: transparent; }
+}
+
+/* Mouse and trackpad: let people select and copy again. */
+@media (hover: hover) and (pointer: fine) {
+  .detail-content,
+  .detail-content p,
+  .detail-content li,
+  .detail-content h2,
+  .detail-content h3,
+  .mol-contact,
+  .foot {
+    -webkit-user-select: text;
+    user-select: text;
+  }
+}
