@@ -188,6 +188,10 @@
     .skills-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 32px; }
     .skill-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--navy); margin-bottom: 5px; }
     .skill-list  { font-size: 13px; color: var(--ink); line-height: 1.7; }
+    .skill-key   { font-size: 12px; color: var(--muted); line-height: 1.75;
+                   background: var(--tint); border-left: 2px solid var(--jrf);
+                   padding: 8px 12px; margin-bottom: 4px; }
+    .skill-key strong { color: var(--navy); }
 
     /* ── INLINE ── */
     .inline-list { font-size: 13.5px; color: var(--ink); line-height: 1.8; }
@@ -352,6 +356,31 @@
 </head>
 <body>
 
+<!-- ══ CV BAR ══ the two CVs are a pair; either one must reach the other, and
+     the page prints to A4 already, so say so instead of leaving it to be found. -->
+<style>
+  .cv-bar {
+    display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;
+    justify-content: flex-end;
+    padding: 0.55rem 1.1rem; font-size: 0.78rem;
+    background: var(--tint, #F4F7FA); color: var(--muted, #4B5563);
+    border-bottom: 1px solid var(--rule, #D1D9E0);
+  }
+  .cv-bar .cv-bar-home { margin-right: auto; }
+  .cv-bar a, .cv-bar button {
+    color: inherit; text-decoration: none; cursor: pointer;
+    font: inherit; border: 1px solid var(--rule, #D1D9E0);
+    border-radius: 999px; padding: 0.2rem 0.7rem; background: none;
+  }
+  .cv-bar a:hover, .cv-bar button:hover { border-color: currentColor; }
+  @media print { .cv-bar { display: none !important; } }
+</style>
+<nav class="cv-bar" aria-label="CV options">
+  <a class="cv-bar-home" href="/">&#8592; Back to site</a>
+  <a href="portfolio-cv.html">Portfolio CV &#8594;</a>
+  <button type="button" onclick="window.print()">Save as PDF</button>
+</nav>
+
 <!-- ═══ HEADER ═══ -->
 <header class="cv-header">
   <div class="cv-name">Sitesh Kumar Dash</div>
@@ -408,7 +437,7 @@
       </div>
       <div class="entry-right">
         <div class="entry-date">2023 — 2025</div>
-        <div class="entry-grade">CGPA 6.07 / 10 · First Class</div>
+        <div class="entry-grade">CGPA 6.06 / 10 · First Class</div>
       </div>
     </div>
     <ul class="bullets">
@@ -416,7 +445,7 @@
       <li>Strong practical and applied scores: Biomolecules Lab (83/100, A+), Biophysical Techniques (75/100, A+), Molecular Biology Lab (78/100, A), Metabolism &amp; Regulation Lab (75/100, A), Bioinformatics Databases &amp; Tools (68/100, B+), Spectroscopy in Biology (66/100, B+).</li>
     </ul>
     <div class="note">
-      <strong>Note on dissertation:</strong> No formal dissertation was completed. The absence reflects institutional infrastructure constraints — a meaningful experimental timeline was not viable when reagent procurement averaged 7–8 working days per order (versus 1–2 days in a well-resourced lab), making a standard benchwork protocol impossible to execute. In lieu of thesis research, completed advanced elective modules including Biophysical Techniques (75/A+), Spectroscopy in Biology, Bioinformatics Databases &amp; Tools, and Biostatistics &amp; Scientific Writing. The Remac-PET System, conceptualised and developed entirely independently outside the formal curriculum, represents the research output that a properly resourced dissertation would have produced.
+      <strong>On the dissertation — a deliberate choice.</strong> The dissertation (BCMB 581) is a four-credit soft-core elective in this programme, not a hard-core requirement. I proposed two projects for it: the <strong>Remac-PET System</strong>, and a <strong>bacteriophage discovery study</strong> — isolating phages from varied environmental soil samples by double-agar-overlay assay, picking single plaques, and screening for a broad-host-range isolate active against multiple bacterial species. Both were judged larger in scope than a soft-core elective could resource, in a cohort of roughly sixty sharing limited bench space and equipment. Rather than run a token project for the credits, I took those credits elsewhere and built breadth instead: of 75 credits earned, 18 came from outside my home department — Bioinformatics (Biophysical Techniques 75/A+, Spectroscopy in Biology, Introduction to Bioinformatics, Bioinformatics Databases &amp; Tools) and Sanskrit &amp; Indian Studies (Indian Intellectual Tradition I &amp; II, Stress Management &amp; Yoga). I pick up an unfamiliar subject quickly and enjoy doing it; that is the habit behind the Remac-PET proposal, the Curves of Thought study and the software below. Remac-PET was developed independently, outside the curriculum, and is the research output that dissertation would have been.
     </div>
   </div>
 
@@ -557,7 +586,7 @@
   <div class="entry">
     <div class="entry-hd">
       <div class="entry-left">
-        <div class="entry-title">Science Programming Associate</div>
+        <div class="entry-title">Science Programming Associate &amp; Science Communicator Team Lead</div>
         <div class="entry-org">Param Foundation · Bengaluru</div>
         <div class="entry-sub">fmr. Programming POC · promoted 26 Jun 2026</div>
       </div>
@@ -588,21 +617,56 @@
 <div class="section">
   <div class="sec-title">Technical Skills</div>
   <div class="skills-grid">
-    <div>
-      <div class="skill-label">Synthetic Biology &amp; Molecular Engineering</div>
-      <div class="skill-list">Lentiviral vector design (pLenti-EF1α-Puro, Addgene) · In-Fusion cloning · Lysosomal targeting constructs (LAMP1 tail, GYEQF sorting signal) · Primer design · Recombinant protein expression · Expression vector engineering</div>
+    <div class="skill-key">
+      Stated plainly, so an interview can go straight to the bench.
+      <strong>Independent</strong> — performed unsupervised on real samples or real data.
+      <strong>Supported</strong> — performed for real, with supervision or AI pairing.
+      <strong>Design</strong> — designed and specified on paper; not yet executed.
+      <strong>Theory</strong> — principle and interpretation from coursework; no hands-on time.
     </div>
     <div>
-      <div class="skill-label">Bioanalytical &amp; Biophysical Techniques</div>
-      <div class="skill-list">ELISA · Western Blotting &amp; densitometry (ImageJ) · DNA isolation · PCR &amp; qRT-PCR · Biophysical Techniques (spectroscopy, analytical ultracentrifugation, circular dichroism — theory &amp; interpretation) · Bisulfite sequencing design &amp; analysis</div>
+      <div class="skill-label">Enzymology &nbsp;·&nbsp; Independent</div>
+      <div class="skill-list">The most directly relevant bench training I hold for an enzyme thesis. Determination of K<sub>m</sub> and V<sub>max</sub>; inhibition studies and determination of K<sub>i</sub>; catalytic efficiency; partial purification and specific activity; endpoint, continuous-monitoring and coupled assays; effects of pH, temperature and substrate concentration on activity. M.Sc. Enzymology Lab, 71/100, A.</div>
+    </div>
+    <div>
+      <div class="skill-label">Molecular Biology &amp; Cloning &nbsp;·&nbsp; Independent</div>
+      <div class="skill-list">Preparation of competent cells · CaCl₂-mediated transformation · DNA ligation · sub-cloning of GFP · PCR · RFLP · RAPD · genomic and plasmid DNA extraction · restriction digestion · agarose gel electrophoresis and gel extraction · RNA isolation and formaldehyde-agarose analysis · spectrophotometric purity assessment. M.Sc. Molecular Biology Lab 78/100 A; Genetic Engineering Lab 60/100 B.</div>
+    </div>
+    <div>
+      <div class="skill-label">Protein, Immuno &amp; Separation &nbsp;·&nbsp; Independent</div>
+      <div class="skill-list">ELISA · SDS-PAGE · immunoblotting · double immunodiffusion · single radial immunodiffusion · immunoelectrophoresis · ion-exchange chromatography · size-exclusion (gel filtration) · partition and adsorption chromatography · isoelectric-point determination · subcellular fractionation by centrifugation · UV-Vis spectrophotometry · Lowry, Biuret, DNSA and Benedict's quantification. Biomolecules Lab 83/100, A+ — my highest mark.</div>
+    </div>
+    <div>
+      <div class="skill-label">Microbiology &amp; Cell Biology &nbsp;·&nbsp; Independent</div>
+      <div class="skill-list">Sterile technique and autoclaving · media preparation · serial dilution and isolation from soil · spread, streak and pour plate · bacterial growth curves · Gram and spore staining · biochemical identification · antibiotic sensitivity testing · culture preservation (slants, glycerol stocks, lyophilisation) · light microscopy · mitochondrial and peroxisomal isolation with function assays · Na⁺/K⁺ ATPase estimation · osmotic fragility · karyotyping.</div>
+    </div>
+    <div>
+      <div class="skill-label">Instrumentation &amp; Techniques &nbsp;·&nbsp; Theory</div>
+      <div class="skill-list">Stated plainly because an interview will ask. HPLC · mass spectrometry · analytical ultracentrifugation · circular dichroism · NMR and ESR spectroscopy · quantitative RT-PCR — principle, method selection and interpretation of output, from Biophysical Techniques (75/100, A+) and Spectroscopy in Biology (66/100, B+); no independent instrument time to date. Mammalian cell culture was taught as a demonstration only, so THP-1 work in the Remac-PET plan is training I would need at the start of a PhD.</div>
     </div>
     <div>
       <div class="skill-label">Computational &amp; Structural Biology</div>
-      <div class="skill-list">PyMOL (3D protein modelling, active site mapping) · Cytoscape (biological network visualisation) · BLAST · ClustalW · MEGA (phylogenetic analysis) · Bioinformatics Databases &amp; Tools · RasMol · Cn3D</div>
+      <div class="skill-list"><em>Independent:</em> BLAST · ClustalW · MEGA (phylogenetic analysis) · NCBI / PDB · BioEdit · GeneDoc · MEME · dot-plot, pairwise and multiple sequence alignment · primer design. &nbsp; <em>Coursework (Bioinformatics Databases &amp; Tools, 68/100, B+):</em> PyMOL · RasMol · Cn3D. &nbsp; <em>Supported (AI-paired):</em> PyMOL at working level for active-site mapping · Cytoscape for network visualisation. &nbsp; <em>Building:</em> Blender for structural and exhibit animation.</div>
     </div>
     <div>
-      <div class="skill-label">Data Analysis &amp; Research Methods</div>
-      <div class="skill-list">GraphPad Prism (hypothesis testing, non-linear regression, IC50/EC50 fitting, publication-grade charting) · ImageJ densitometry · Excel (advanced) · Naturalistic observational study design · Structured behavioural coding · Biostatistics &amp; Scientific Writing</div>
+      <div class="skill-label">Experimental Design &nbsp;·&nbsp; Specified, not yet executed</div>
+      <div class="skill-list">The Remac-PET construct and assay plan were designed from the literature, not run at the bench: lentiviral vector design (pLenti-EF1α-Puro, Addgene) · Vpx packaging to overcome SAMHD1 restriction · In-Fusion cloning strategy · lysosomal targeting construct (LAMP1 cytoplasmic tail, GYEQF sorting signal) · bisulfite sequencing design (nt −250 to +50, 12 CpG sites) · Transwell co-culture and four-group readout panel. Executing this plan is what the PhD is for.</div>
+    </div>
+    <div>
+      <div class="skill-label">Data Analysis &amp; Research Methods &nbsp;·&nbsp; Independent</div>
+      <div class="skill-list">GraphPad Prism (hypothesis testing, non-linear regression, IC50/EC50 fitting, publication-grade charting) · ImageJ densitometry · Excel (advanced) · Naturalistic observational study design · Structured behavioural coding · Inter-observer bias sub-study design · Biostatistics &amp; Scientific Writing</div>
+    </div>
+    <div>
+      <div class="skill-label">Research Programme &amp; Grant Design &nbsp;·&nbsp; Independent</div>
+      <div class="skill-list">Authored full funding applications end to end — scientific case, pedagogy, participant ethics, risk, timeline and line-item budget: <strong>The Kitchen Biochemist</strong>, Biochemical Society EDI &amp; Outreach Grant (£998 of a £1,000 cap; six household-biochemistry experiments, 100 children across two government schools, 15 weeks) and <strong>Chemistry Mela 2027</strong>, ACS Chemistry Festival Grant (USD 3,000 budget with per-line justification, safety compliance and in-kind co-funding). Also authored the ParSEC Biotech Story Arc five-zone gallery proposal.</div>
+    </div>
+    <div>
+      <div class="skill-label">Scientific Software &amp; Systems &nbsp;·&nbsp; Independent</div>
+      <div class="skill-list">Designed and built the Nucleus Hub, the operations and reporting system the centre runs on — roster scheduling with automated fairness checks, a weekly scoring and reporting engine, exhibit-fault tracking and a public exhibit guide. Google Apps Script · JavaScript · HTML/CSS · Google Sheets and Drive APIs · regression-style check scripts · Git. Roughly 110,000 lines across 600+ commits.</div>
+    </div>
+    <div>
+      <div class="skill-label">AI-Augmented Research Practice</div>
+      <div class="skill-list">Works fluently with large language models as a research instrument rather than a shortcut — literature triage and citation chasing, construct and assay design review, statistical and figure work, grant drafting, and paired programming. Every output above was produced this way and is held to the same standard of verification: claims traced to primary sources, and capability stated at the level actually reached.</div>
     </div>
   </div>
 </div>

@@ -295,6 +295,20 @@ body {
   padding-bottom: 0.1rem;
 }
 
+/* The CV is the one thing a reviewer must never have to hunt for. */
+.nav a.nav-cv {
+  color: var(--neon);
+  border: 1px solid rgba(57, 255, 20, 0.45);
+  border-radius: 999px;
+  padding: 0.16rem 0.6rem;
+  margin-left: 0.25rem;
+}
+
+.nav a.nav-cv:hover {
+  background: rgba(57, 255, 20, 0.12);
+  border-color: var(--neon);
+}
+
 /* ─── Molecular graph ─── */
 .mol-graph {
   position: relative;
@@ -2217,14 +2231,16 @@ input, textarea { cursor: text; }
   position: fixed;
   pointer-events: none;
   font-family: var(--font-mono);
-  font-size: 0.65rem;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  background: rgba(5,10,18,0.95);
+  /* Holds a two-line explanation now, so no uppercase and no nowrap. */
+  font-size: 0.76rem;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+  text-align: center;
+  background: rgba(5,10,18,0.97);
   border: 1px solid rgba(0,229,255,0.4);
   border-radius: 6px;
-  padding: 0.28rem 0.65rem;
-  white-space: nowrap;
+  padding: 0.4rem 0.8rem;
+  max-width: 17rem;
   opacity: 0;
   transform: translate(-50%, 0);
   transition: opacity 0.15s ease;
@@ -2238,8 +2254,9 @@ input, textarea { cursor: text; }
   gap: 0.4rem 0.9rem;
   margin-top: 0.55rem;
   font-family: var(--font-mono);
-  font-size: 0.62rem;
-  letter-spacing: 0.06em;
+  font-size: 0.74rem;
+  letter-spacing: 0.02em;
+  color: rgba(238,242,255,0.88);
 }
 .sds-legend-item { display: flex; align-items: center; gap: 0.3rem; }
 .sds-legend-dot {
@@ -2439,16 +2456,19 @@ input, textarea { cursor: text; }
   letter-spacing: 0.06em;
   margin-bottom: 0.2rem;
 }
+/* These chips carry real sentences now ("PCR · qPCR — independent"), not
+   one-word labels, so uppercase + wide tracking at 9px was unreadable.
+   Sentence case, larger, and a green that actually clears AA on black. */
 .edu-tag {
   font-family: var(--font-mono);
-  font-size: 0.58rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: #1D9E75;
-  border: 1px solid rgba(29,158,117,0.3);
+  font-size: 0.7rem;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+  color: #5BE8B0;
+  border: 1px solid rgba(91,232,176,0.42);
   border-radius: 999px;
-  padding: 0.12rem 0.42rem;
-  background: rgba(29,158,117,0.06);
+  padding: 0.18rem 0.55rem;
+  background: rgba(91,232,176,0.08);
 }
 .edu-tag.hi {
   color: #3dffb8;

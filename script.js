@@ -1084,10 +1084,14 @@
         }
         finalizeOpen();
 
-        if (panel && clickAnchor) {
+        // Hold the anchor in a local: closing the panel (or opening another)
+        // clears clickAnchor, and these two frames land after that happens,
+        // which left animatePanelIn reading .x off null.
+        const anchor = clickAnchor;
+        if (panel && anchor) {
           requestAnimationFrame(() => {
             requestAnimationFrame(() => {
-              animatePanelIn(panel, clickAnchor);
+              animatePanelIn(panel, anchor);
             });
           });
         }

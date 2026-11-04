@@ -1509,13 +1509,14 @@
 
     // pi: 3..10 (x), mw: 0..1 fraction (1 = high MW, top), size = spot radius px
     const SPOTS = [
-      { label: 'Badminton · OIBT2025', pi: 4.4, mw: 0.74, size: 17, color: '#39ff14', lvl: 'Strongly expressed' },
-      { label: 'Narrative science',     pi: 7.1, mw: 0.82, size: 16, color: '#ff9f43', lvl: 'Strongly expressed' },
-      { label: 'Competitive BGMI',      pi: 6.0, mw: 0.46, size: 14, color: '#00e5ff', lvl: 'Highly expressed' },
-      { label: 'Dermatological biochem',pi: 5.1, mw: 0.30, size: 13, color: '#b44dff', lvl: 'Expressed' },
-      { label: 'PC hardware',           pi: 8.4, mw: 0.56, size: 12, color: '#00e5ff', lvl: 'Expressed' },
-      { label: 'Languages · En/Hi/Od',  pi: 3.7, mw: 0.52, size: 13, color: '#ffd54f', lvl: 'Constitutive' },
-      { label: 'Anime · Naruto, JJK',   pi: 6.7, mw: 0.20, size: 11, color: '#ff3366', lvl: 'Expressed' },
+      { label: 'Badminton · OIBT2025',  pi: 4.4, mw: 0.76, size: 17, color: '#39ff14', lvl: 'Strongly expressed' },
+      { label: 'Cricket · outdoor games', pi: 3.6, mw: 0.54, size: 15, color: '#39ff14', lvl: 'Strongly expressed' },
+      { label: 'Narrative science',     pi: 7.1, mw: 0.86, size: 16, color: '#ff9f43', lvl: 'Strongly expressed' },
+      { label: 'New skills, fast',      pi: 8.7, mw: 0.68, size: 15, color: '#ff9f43', lvl: 'Strongly expressed' },
+      { label: 'Open-world gaming',     pi: 6.0, mw: 0.44, size: 14, color: '#00e5ff', lvl: 'Highly expressed' },
+      { label: 'PC hardware',           pi: 9.2, mw: 0.34, size: 12, color: '#00e5ff', lvl: 'Expressed' },
+      { label: 'Dermatological biochem',pi: 5.0, mw: 0.28, size: 13, color: '#b44dff', lvl: 'Expressed' },
+      { label: 'Anime · shōnen',        pi: 6.9, mw: 0.16, size: 12, color: '#ff3366', lvl: 'Expressed' },
     ];
 
     const GW = () => W - PAD.l - PAD.r, GH = () => H - PAD.t - PAD.b;
@@ -1708,37 +1709,46 @@
     const LANE_W = W / 5;   // col 0 = ladder, cols 1-4 = lanes
     const PAD_T = 42, GH = H - PAD_T - 36;
 
+    // Band height IS the claim: the higher it runs, the more independent the
+    // skill. Theory-only and in-progress bands sit low on purpose, so the gel
+    // tells the truth at a glance instead of flattering it.
+    //   independent — done unsupervised on real samples or real data
+    //   supported   — done for real, with supervision or AI pairing
+    //   design      — designed on paper; not executed at the bench
+    //   theory      — principle and interpretation; no hands-on time
+    //   building    — actively learning now
     const LANES = [
-      { label: ['Molecular', 'Techniques'],  col: '#00e5ff',
+      { label: ['Wet Lab'],                  col: '#00e5ff',
         bands: [
-          { name:'PCR · qPCR',     lv:0.10, lbl:'expert' },
-          { name:'Cloning',        lv:0.24, lbl:'advanced' },
-          { name:'Western · ELISA', lv:0.38, lbl:'advanced' },
-          { name:'SDS-PAGE · HPLC', lv:0.52, lbl:'advanced' },
+          { name:'Enzyme kinetics',   lv:0.08, lbl:'independent' },
+          { name:'Cloning · PCR',     lv:0.19, lbl:'independent' },
+          { name:'DNA/RNA · gels',    lv:0.30, lbl:'independent' },
+          { name:'ELISA · Western',   lv:0.41, lbl:'independent' },
+          { name:'HPLC · Mass spec',  lv:0.80, lbl:'theory' },
         ] },
-      { label: ['Bioinfor-', 'matics'],      col: '#39ff14',
+      { label: ['Computational'],            col: '#39ff14',
         bands: [
-          { name:'BLAST · PDB',    lv:0.10, lbl:'advanced' },
-          { name:'PyMOL',          lv:0.24, lbl:'advanced' },
-          { name:'Cytoscape',      lv:0.38, lbl:'advanced' },
-          { name:'Prism · R · ImageJ', lv:0.52, lbl:'advanced' },
+          { name:'BLAST · ClustalW',  lv:0.10, lbl:'independent' },
+          { name:'Prism · ImageJ',    lv:0.21, lbl:'independent' },
+          { name:'PyMOL · RasMol',    lv:0.44, lbl:'coursework' },
+          { name:'Cytoscape',         lv:0.56, lbl:'supported' },
+          { name:'Blender',           lv:0.80, lbl:'building' },
         ] },
       { label: ['Science', 'Comm.'],         col: '#EF9F27',
         bands: [
-          { name:'Live exhibits',  lv:0.10, lbl:'expert' },
-          { name:'Facilitation',   lv:0.24, lbl:'expert' },
-          { name:'LN₂ · cobot',    lv:0.38, lbl:'advanced' },
-          { name:'Canva · Design', lv:0.52, lbl:'advanced' },
+          { name:'Live exhibits',     lv:0.08, lbl:'independent' },
+          { name:'Facilitation · pedagogy', lv:0.19, lbl:'independent' },
+          { name:'LN₂ · cobot rigs',  lv:0.30, lbl:'independent' },
+          { name:'Study design (N≈1,568)', lv:0.41, lbl:'independent' },
         ] },
-      { label: ['Research'],                 col: '#b44dff',
+      { label: ['Research', '& Systems'],    col: '#b44dff',
         bands: [
-          { name:'Remac-PET',      lv:0.14, lbl:'advanced' },
-          { name:'FAST-PETase',    lv:0.30, lbl:'advanced' },
-          { name:'Epigenetics',    lv:0.44, lbl:'advanced' },
-          { name:'Macrophage Eng.', lv:0.58, lbl:'developing' },
+          { name:'Grant design',      lv:0.10, lbl:'independent' },
+          { name:'Apps Script · JS',  lv:0.21, lbl:'independent' },
+          { name:'Remac-PET design',  lv:0.50, lbl:'design' },
+          { name:'Cell culture',      lv:0.80, lbl:'theory' },
         ] },
     ];
-    const LV_LABEL = { 0.08:'expert', 0.16:'expert', 0.25:'advanced', 0.28:'advanced', 0.30:'advanced', 0.50:'intermediate' };
 
     const MW = [250, 150, 100, 75, 50];
 
@@ -1788,8 +1798,8 @@
         const cx = LANE_W * (li + 1) + LANE_W / 2;
         ctx.save();
         ctx.fillStyle = lane.col;
-        ctx.globalAlpha = 0.72;
-        ctx.font = 'bold 8.5px "JetBrains Mono",monospace';
+        ctx.globalAlpha = 0.95;
+        ctx.font = 'bold 10.5px "JetBrains Mono",monospace';
         lane.label.forEach((ln, idx) => ctx.fillText(ln, cx, 13 + idx * 13));
         ctx.restore();
       });
@@ -1798,7 +1808,10 @@
       LANES.forEach((lane, li) => {
         const lx = LANE_W * (li + 1);
         lane.bands.forEach((band, bi) => {
-          const delay = (li * 0.2 + bi * 0.15);
+          // Keep every band's delay under 0.5 so delay + the 0.5 fade still
+          // lands inside progress's 0→1 range; the old 0.2/0.15 stagger put
+          // the last lane's lowest band at 1.05 and it never drew at all.
+          const delay = (li * 0.08 + bi * 0.06);
           const p = Math.max(0, Math.min((progress - delay) / 0.5, 1));
           if (p <= 0) return;
           const y = PAD_T + band.lv * GH;
@@ -1818,7 +1831,7 @@
             ctx.fillStyle   = '#ffffff';
             ctx.shadowColor = lane.col;
             ctx.shadowBlur  = 0 /* no glow */;
-            ctx.font = `7.5px "JetBrains Mono",monospace`;
+            ctx.font = `9.5px "JetBrains Mono",monospace`;
             ctx.textAlign   = 'center';
             ctx.fillText(band.name, lx + LANE_W / 2, y + 1.5);
             ctx.restore();
@@ -1828,11 +1841,11 @@
 
       // "Expert / Advanced / Intermediate" scale axis at right
       ctx.save();
-      ctx.fillStyle = 'rgba(255,255,255,0.18)';
-      ctx.font = '7px "JetBrains Mono",monospace';
+      ctx.fillStyle = 'rgba(255,255,255,0.5)';
+      ctx.font = '8.5px "JetBrains Mono",monospace';
       ctx.textAlign = 'left';
-      ctx.fillText('▲ Expert', W - LANE_W * 0.92, PAD_T + 6);
-      ctx.fillText('▼ Beginner', W - LANE_W * 0.92, H - 36);
+      ctx.fillText('▲ Hands-on', W - LANE_W * 0.92, PAD_T + 6);
+      ctx.fillText('▼ Theory', W - LANE_W * 0.92, H - 36);
       ctx.restore();
     }
 
@@ -1846,12 +1859,25 @@
     }
     requestAnimationFrame(anim);
 
-    // Hover tooltip
+    // Say what the tier MEANS, not just its name — "theory" on its own reads
+    // like a grade, and a reader should never have to guess whether a skill
+    // has been done with two hands or only read about.
+    const TIER_TEXT = {
+      independent: 'Hands-on — run myself in the M.Sc. labs',
+      coursework:  'Hands-on in taught coursework — introductory level',
+      supported:   'Hands-on with support — supervised or AI-paired',
+      design:      'Designed on paper — not executed at the bench',
+      theory:      'Theoretical — not hands-on',
+      building:    'Learning now — not yet independent',
+    };
+
+    // Tooltip on hover AND on tap: a touch screen has no hover, so without the
+    // click path every level on this gel is unreadable on a phone.
     if (tip) {
-      canvas.addEventListener('mousemove', e => {
+      const bandAt = (clientX, clientY) => {
         const rect = canvas.getBoundingClientRect();
-        const mx = (e.clientX - rect.left) * (W / rect.width);
-        const my = (e.clientY - rect.top)  * (H / rect.height);
+        const mx = (clientX - rect.left) * (W / rect.width);
+        const my = (clientY - rect.top)  * (H / rect.height);
         let found = null;
         LANES.forEach((lane, li) => {
           const lx = LANE_W * (li + 1);
@@ -1861,19 +1887,59 @@
             if (Math.abs(my - y) < 9) found = { band, lane };
           });
         });
-        if (found) {
-          const lv = found.band.lbl || LV_LABEL[found.band.lv] || 'skilled';
-          tip.textContent  = `${found.band.name}  ·  ${lv.toUpperCase()}`;
-          tip.style.left   = e.clientX + 'px';
-          tip.style.top    = (e.clientY - 38) + 'px';
-          tip.style.color  = found.lane.col;
-          tip.style.borderColor = found.lane.col;
-          tip.classList.add('visible');
-        } else {
-          tip.classList.remove('visible');
-        }
+        return found;
+      };
+
+      const show = (found, clientX, clientY) => {
+        const lv = found.band.lbl || 'skilled';
+        tip.innerHTML = '';
+        const nm = document.createElement('div');
+        nm.textContent = found.band.name;
+        nm.style.fontWeight = '700';
+        const ex = document.createElement('div');
+        ex.textContent = TIER_TEXT[lv] || lv;
+        ex.style.opacity = '0.85';
+        ex.style.fontSize = '0.92em';
+        tip.append(nm, ex);
+        // Make it visible and laid out BEFORE measuring: offsetWidth on a
+        // hidden, empty tip reads 0 and the clamp below then centres nothing.
+        tip.classList.add('visible');
+        // An ancestor of the tip establishes a containing block, so its
+        // position:fixed behaves as absolute — client coordinates land it in
+        // the wrong place. Convert into the offsetParent's space, then clamp
+        // so a wide label can't hang off the edge of the gel.
+        const host = tip.offsetParent
+          ? tip.offsetParent.getBoundingClientRect()
+          : { left: 0, top: 0 };
+        const gel  = canvas.getBoundingClientRect();
+        const half = tip.offsetWidth / 2 + 6;
+        const x = Math.max(gel.left + half, Math.min(gel.right - half, clientX));
+        tip.style.left = (x - host.left) + 'px';
+        tip.style.top  = (clientY - host.top - 52) + 'px';
+        tip.style.color  = found.lane.col;
+        tip.style.borderColor = found.lane.col;
+        tip.classList.add('visible');
+      };
+
+      let pinned = false;
+
+      canvas.addEventListener('mousemove', e => {
+        if (pinned) return;
+        const found = bandAt(e.clientX, e.clientY);
+        if (found) show(found, e.clientX, e.clientY);
+        else tip.classList.remove('visible');
       });
-      canvas.addEventListener('mouseleave', () => tip.classList.remove('visible'));
+      canvas.addEventListener('mouseleave', () => {
+        if (!pinned) tip.classList.remove('visible');
+      });
+
+      // A tap pins the label so it stays put; tapping off it clears.
+      canvas.addEventListener('click', e => {
+        const found = bandAt(e.clientX, e.clientY);
+        if (found) { pinned = true; show(found, e.clientX, e.clientY); }
+        else { pinned = false; tip.classList.remove('visible'); }
+      });
+      canvas.style.cursor = 'pointer';
     }
   }
 
